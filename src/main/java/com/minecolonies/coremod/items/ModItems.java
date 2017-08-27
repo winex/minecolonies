@@ -21,6 +21,7 @@ public final class ModItems
     public static final Item itemAchievementProxyTown       = new ItemAchievementProxy("sizeTown");
     public static final Item itemAchievementProxyCity       = new ItemAchievementProxy("sizeCity");
     public static final Item itemAchievementProxyMetropolis = new ItemAchievementProxy("sizeMetropolis");
+    public static final Item itemMinecoloniesBook           = new ItemBook();
 
     // deactivated for now
     // public static final Item compost    = new ItemCompost();

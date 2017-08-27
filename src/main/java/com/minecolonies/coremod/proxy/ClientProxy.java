@@ -152,6 +152,7 @@ public class ClientProxy extends CommonProxy
         itemModelMesher.register(ModItems.itemAchievementProxyTown, 0, new ModelResourceLocation(ModItems.itemAchievementProxyTown.getRegistryName(), INVENTORY));
         itemModelMesher.register(ModItems.itemAchievementProxyCity, 0, new ModelResourceLocation(ModItems.itemAchievementProxyCity.getRegistryName(), INVENTORY));
         itemModelMesher.register(ModItems.itemAchievementProxyMetropolis, 0, new ModelResourceLocation(ModItems.itemAchievementProxyMetropolis.getRegistryName(), INVENTORY));
+        itemModelMesher.register(ModItems.itemMinecoloniesBook, 0, new ModelResourceLocation(ModItems.itemMinecoloniesBook.getRegistryName(), INVENTORY));
     }
 
     @Override
