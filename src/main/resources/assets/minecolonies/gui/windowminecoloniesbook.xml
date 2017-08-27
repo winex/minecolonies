@@ -3,5 +3,17 @@
         xsi:noNamespaceSchemaLocation="file:../../../../java/com/minecolonies/blockout/blockOut.xsd">
 
     <image source="minecolonies:textures/gui/townhall_book.png" size="100% 100%"/>
-    
+
+    <switch id="pages" size="100% 200px" pos="0 7">
+        <view id="page1" size="100% 100%">
+
+        </view>
+
+        <view id="page2" size="100% 100%">
+            
+        </view>
+
+
+    </switch>
+
 </window>
