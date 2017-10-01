@@ -1,11 +1,11 @@
 package com.minecolonies.coremod.items;
 
-import com.minecolonies.api.colony.management.ColonyManager;
+import com.minecolonies.api.IAPI;
+import com.minecolonies.api.colony.IColony;
+import com.minecolonies.api.colony.buildings.IBuilding;
 import com.minecolonies.api.util.BlockPosUtil;
 import com.minecolonies.api.util.LanguageHandler;
 import com.minecolonies.coremod.colony.CitizenData;
-import com.minecolonies.coremod.colony.Colony;
-import com.minecolonies.coremod.colony.buildings.AbstractBuilding;
 import com.minecolonies.coremod.colony.buildings.BuildingGuardTower;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -88,14 +88,15 @@ public class ItemScepterGuard extends AbstractItemMinecolonies
     @NotNull
     private static EnumActionResult handleItemUsage(final World worldIn, final BlockPos pos, final NBTTagCompound compound, final EntityPlayer playerIn)
     {
-        final Colony colony = ColonyManager.getClosestColony(worldIn, pos);
+        final IColony colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(worldIn).getClosestColony(pos);
+
         if (colony == null)
         {
             return EnumActionResult.FAIL;
         }
 
         final BlockPos guardTower = BlockPosUtil.readFromNBT(compound, "pos");
-        final AbstractBuilding hut = colony.getBuilding(guardTower);
+        final IBuilding hut = colony.getBuilding(guardTower);
         if (hut == null || !(hut instanceof BuildingGuardTower))
         {
             return EnumActionResult.FAIL;

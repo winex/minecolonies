@@ -2,6 +2,7 @@ package com.minecolonies.coremod.blocks;
 
 import com.minecolonies.api.IAPI;
 import com.minecolonies.api.colony.IColony;
+import com.minecolonies.api.colony.buildings.IBuilding;
 import com.minecolonies.api.colony.buildings.IHutBlock;
 import com.minecolonies.api.colony.permissions.Action;
 import com.minecolonies.api.entity.ai.citizen.builder.IBuilderUndestroyable;
@@ -201,7 +202,7 @@ public abstract class AbstractBlockHut extends Block implements ITileEntityProvi
          */
         if (worldIn.isRemote)
         {
-            @Nullable final AbstractBuilding.View building = (AbstractBuilding.View) IAPI.Holder.getApi().getColonyManager().getBuilding(worldIn, pos);
+            @Nullable final IBuilding building = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(worldIn).getColony(pos).getBuilding(pos);
 
             if (building != null
                   && building.getColony() != null
@@ -260,7 +261,7 @@ public abstract class AbstractBlockHut extends Block implements ITileEntityProvi
         if (placer instanceof EntityPlayer && tileEntity instanceof TileEntityColonyBuilding)
         {
             @NotNull final TileEntityColonyBuilding hut = (TileEntityColonyBuilding) tileEntity;
-            @Nullable final IColony colony = IAPI.Holder.getApi().getColonyManager().getColony(worldIn, hut.getPosition());
+            @Nullable final IColony colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(worldIn).getColony(hut.getPosition());
 
             if (colony != null)
             {

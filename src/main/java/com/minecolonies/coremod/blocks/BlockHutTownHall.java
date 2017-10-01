@@ -1,9 +1,9 @@
 package com.minecolonies.coremod.blocks;
 
-import com.minecolonies.api.colony.management.ColonyManager;
+import com.minecolonies.api.IAPI;
+import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.configuration.Configurations;
 import com.minecolonies.api.util.BlockPosUtil;
-import com.minecolonies.coremod.colony.Colony;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -46,14 +46,14 @@ public class BlockHutTownHall extends AbstractBlockHut
 
         if (placer.getActiveHand().equals(EnumHand.MAIN_HAND))
         {
-            final Colony colony = ColonyManager.getClosestColony(worldIn, pos);
+            final IColony colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(worldIn).getClosestColony(pos);
 
             if ((colony == null
                    || BlockPosUtil.getDistance2D(colony.getCenter(), pos) >= Configurations.workingRangeTownHall * 2 + Configurations.townHallPadding)
                   && placer instanceof EntityPlayer)
             {
 
-                ColonyManager.createColony(worldIn, pos, (EntityPlayer) placer);
+                IAPI.Holder.getApi().getColonyManager().getControllerForWorld(worldIn).createColony(pos, (EntityPlayer) placer);
             }
         }
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);

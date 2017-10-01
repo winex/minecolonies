@@ -1,8 +1,9 @@
 package com.minecolonies.coremod.items;
 
-import com.minecolonies.api.colony.management.ColonyManager;
+import com.minecolonies.api.IAPI;
 import com.minecolonies.api.configuration.Configurations;
 import com.minecolonies.api.lib.Constants;
+import com.minecolonies.api.reference.ModAchievements;
 import com.minecolonies.api.reference.ModBlocks;
 import com.minecolonies.api.reference.ModItems;
 import com.minecolonies.api.util.BlockUtils;
@@ -297,7 +298,9 @@ public class ItemSupplyChestDeployer extends AbstractItemMinecolonies
      */
     private static boolean notInAnyColony(final World world, final BlockPos pos1, final BlockPos pos2, final BlockPos pos3)
     {
-        return !ColonyManager.isCoordinateInAnyColony(world, pos1) && !ColonyManager.isCoordinateInAnyColony(world, pos2) && !ColonyManager.isCoordinateInAnyColony(world, pos3);
+        return !IAPI.Holder.getApi().getColonyManager().getControllerForWorld(world).isCoordinateInAnyColony(pos1)
+                && !IAPI.Holder.getApi().getColonyManager().getControllerForWorld(world).isCoordinateInAnyColony(pos2)
+                && !IAPI.Holder.getApi().getColonyManager().getControllerForWorld(world).isCoordinateInAnyColony(pos3);
     }
 
     @NotNull

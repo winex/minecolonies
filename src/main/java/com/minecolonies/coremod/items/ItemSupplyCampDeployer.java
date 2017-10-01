@@ -1,8 +1,9 @@
 package com.minecolonies.coremod.items;
 
-import com.minecolonies.api.colony.management.ColonyManager;
+import com.minecolonies.api.IAPI;
 import com.minecolonies.api.configuration.Configurations;
 import com.minecolonies.api.lib.Constants;
+import com.minecolonies.api.reference.ModAchievements;
 import com.minecolonies.api.reference.ModBlocks;
 import com.minecolonies.api.reference.ModItems;
 import com.minecolonies.api.util.LanguageHandler;
@@ -164,7 +165,7 @@ public class ItemSupplyCampDeployer extends AbstractItemMinecolonies
      */
     private static boolean isInsideAColony(final World world, final BlockPos pos)
     {
-        return ColonyManager.isCoordinateInAnyColony(world, pos);
+        return IAPI.Holder.getApi().getColonyManager().getControllerForWorld(world).isCoordinateInAnyColony(pos);
     }
 
     private boolean checkAndPlaceSupplyCamp(final World world, @NotNull final BlockPos pos, @NotNull final EnumFacing direction)

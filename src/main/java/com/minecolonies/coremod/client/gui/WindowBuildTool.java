@@ -1,6 +1,6 @@
 package com.minecolonies.coremod.client.gui;
 
-import com.minecolonies.api.colony.management.ColonyManager;
+import com.minecolonies.api.IAPI;
 import com.minecolonies.api.lib.Constants;
 import com.minecolonies.api.util.BlockUtils;
 import com.minecolonies.api.util.LanguageHandler;
@@ -184,7 +184,7 @@ public class WindowBuildTool extends AbstractWindowSkeleton
      * List of section.
      */
     @NotNull
-    private List<String> sections = new ArrayList<>();
+    private final List<String> sections = new ArrayList<>();
     /**
      * List of style for the section.
      */
@@ -452,9 +452,10 @@ public class WindowBuildTool extends AbstractWindowSkeleton
     {
         super.onUpdate();
 
-        if (ColonyManager.isSchematicDownloaded())
+
+        if (IAPI.Holder.getApi().getColonyManager().isSchematicDownloaded())
         {
-            ColonyManager.setSchematicDownloaded(false);
+            IAPI.Holder.getApi().getColonyManager().setSchematicDownloaded(false);
             changeSchematic();
         }
     }

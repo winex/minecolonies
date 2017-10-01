@@ -1,10 +1,10 @@
 package com.minecolonies.coremod.blocks;
 
-import com.minecolonies.api.colony.management.ColonyManager;
+import com.minecolonies.api.IAPI;
+import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.entity.ai.citizen.farmer.IFieldBlock;
 import com.minecolonies.api.lib.Constants;
 import com.minecolonies.coremod.MineColonies;
-import com.minecolonies.coremod.colony.Colony;
 import com.minecolonies.coremod.creativetab.ModCreativeTabs;
 import com.minecolonies.coremod.tileentities.ScarecrowTileEntity;
 import net.minecraft.block.BlockContainer;
@@ -177,7 +177,7 @@ public class BlockHutField extends BlockContainer implements IFieldBlock
         //If the world is server, open the inventory of the field.
         if (!worldIn.isRemote)
         {
-            @Nullable final Colony colony = ColonyManager.getColony(worldIn, pos);
+            @Nullable final IColony colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(worldIn).getColony(pos);
             if (colony != null)
             {
                 playerIn.openGui(MineColonies.instance, 0, worldIn, pos.getX(), pos.getY(), pos.getZ());
@@ -219,7 +219,7 @@ public class BlockHutField extends BlockContainer implements IFieldBlock
 
         if (placer instanceof EntityPlayer)
         {
-            @Nullable final Colony colony = ColonyManager.getColony(worldIn, pos);
+            @Nullable final IColony colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(worldIn).getColony(pos);
 
             if (colony != null)
             {
