@@ -3,8 +3,8 @@ package com.minecolonies.coremod.entity;
 import com.minecolonies.api.client.render.Model;
 import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.colony.IColony;
+import com.minecolonies.api.colony.buildings.IBuilding;
 import com.minecolonies.api.colony.jobs.IJob;
-import com.minecolonies.api.colony.management.ColonyManager;
 import com.minecolonies.api.colony.permissions.Action;
 import com.minecolonies.api.colony.permissions.Player;
 import com.minecolonies.api.colony.permissions.Rank;
@@ -15,6 +15,7 @@ import com.minecolonies.api.entity.DesiredCitizenActivity;
 import com.minecolonies.api.entity.pathfinding.PathNavigate;
 import com.minecolonies.api.inventory.InventoryCitizen;
 import com.minecolonies.api.lib.Constants;
+import com.minecolonies.api.reference.ModAchievements;
 import com.minecolonies.api.util.*;
 import com.minecolonies.coremod.MineColonies;
 import com.minecolonies.coremod.colony.CitizenData;
@@ -462,7 +463,7 @@ public class EntityCitizen extends Citizen
      */
     @Override
     @Nullable
-    public AbstractBuildingWorker getWorkBuilding()
+    public IBuilding getWorkBuilding()
     {
         return (citizenData == null) ? null : citizenData.getWorkBuilding();
     }
@@ -485,7 +486,7 @@ public class EntityCitizen extends Citizen
     @Override
     public void onInventoryChanged()
     {
-        final AbstractBuildingWorker building = citizenData.getWorkBuilding();
+        final IBuilding building = citizenData.getWorkBuilding();
         if (building != null)
         {
             building.markDirty();

@@ -558,37 +558,25 @@ public class CitizenData implements ICitizenData
         return citizenName;
     }
 
-    /**
-     * Adds experience of the citizen.
-     *
-     * @param xp the amount of xp to add.
-     */
+    @Override
     public void addExperience(final double xp)
     {
         this.experience += xp;
     }
 
-    /**
-     * Sets the level of the citizen.
-     */
+    @Override
     public void increaseLevel()
     {
         this.level += 1;
     }
 
-    /**
-     * Returns whether or not the instance is dirty.
-     *
-     * @return true when dirty, otherwise false.
-     */
+    @Override
     public boolean isDirty()
     {
         return dirty;
     }
 
-    /**
-     * Markt the instance not dirty.
-     */
+    @Override
     public void clearDirty()
     {
         dirty = false;

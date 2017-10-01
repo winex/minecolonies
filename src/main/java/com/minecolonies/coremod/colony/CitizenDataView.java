@@ -3,6 +3,7 @@ package com.minecolonies.coremod.colony;
 import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.jobs.IJob;
+import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.api.entity.Citizen;
 import com.minecolonies.api.util.BlockPosUtil;
 import io.netty.buffer.ByteBuf;
@@ -69,7 +70,8 @@ public class CitizenDataView implements ICitizenData
      *
      * @return view Id.
      */
-    public int getID()
+    @Override
+    public int getId()
     {
         return id;
     }
@@ -104,11 +106,6 @@ public class CitizenDataView implements ICitizenData
         return null;
     }
 
-    @Override
-    public int getId()
-    {
-        return 0;
-    }
 
     @Override
     public void initializeFromEntity(@NotNull final Citizen entity)
@@ -245,6 +242,30 @@ public class CitizenDataView implements ICitizenData
     public double getSaturation()
     {
         return saturation;
+    }
+
+    @Override
+    public void addExperience(final double xp)
+    {
+        //Noop
+    }
+
+    @Override
+    public void increaseLevel()
+    {
+        //Noop
+    }
+
+    @Override
+    public boolean isDirty()
+    {
+        return false;
+    }
+
+    @Override
+    public void clearDirty()
+    {
+        //Noop
     }
 
     /**

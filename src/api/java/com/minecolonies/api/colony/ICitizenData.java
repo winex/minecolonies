@@ -148,4 +148,28 @@ public interface ICitizenData
      * @return The saturation of the citizen.
      */
     double getSaturation();
+
+    /**
+     * Adds experience of the citizen.
+     *
+     * @param xp the amount of xp to add.
+     */
+    void addExperience(double xp);
+
+    /**
+     * Sets the level of the citizen.
+     */
+    void increaseLevel();
+
+    /**
+     * Returns whether or not the instance is dirty.
+     *
+     * @return true when dirty, otherwise false.
+     */
+    boolean isDirty();
+
+    /**
+     * Markt the instance not dirty.
+     */
+    void clearDirty();
 }
