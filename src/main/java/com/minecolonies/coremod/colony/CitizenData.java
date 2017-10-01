@@ -726,7 +726,9 @@ public class CitizenData implements ICitizenData
         buf.writeInt(getDexterity());
         buf.writeDouble(getSaturation());
 
-        ByteBufUtils.writeUTF8String(buf, (job != null) ? job.getName() : "");
+        NBTTagCompound compound = new NBTTagCompound();
+        job.writeToNBT(compound);
+        ByteBufUtils.writeTag(buf, compound);
     }
 
     /**
