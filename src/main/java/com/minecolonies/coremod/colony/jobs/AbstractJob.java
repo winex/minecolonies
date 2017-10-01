@@ -1,6 +1,7 @@
 package com.minecolonies.coremod.colony.jobs;
 
 import com.minecolonies.api.client.render.Model;
+import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.jobs.IJob;
 import com.minecolonies.api.entity.ai.basic.AbstractAISkeleton;
@@ -48,9 +49,9 @@ public abstract class AbstractJob implements IJob
 
     //  Job and View Class Mapping.
     @NotNull
-    private static final Map<String, Class<? extends AbstractJob>> nameToClassMap = new HashMap<>();
+    private static final Map<String, Class<? extends IJob>> nameToClassMap = new HashMap<>();
     @NotNull
-    private static final Map<Class<? extends AbstractJob>, String> classToNameMap = new HashMap<>();
+    private static final Map<Class<? extends IJob>, String> classToNameMap = new HashMap<>();
     //fix for the annotation
     static
     {
@@ -64,7 +65,7 @@ public abstract class AbstractJob implements IJob
         addMapping(MAPPING_TOWER_GUARD, JobGuard.class);
     }
 
-    private final CitizenData citizen;
+    private final ICitizenData citizen;
     private String nameTag = "";
 
     /**
@@ -72,7 +73,7 @@ public abstract class AbstractJob implements IJob
      *
      * @param entity the citizen data.
      */
-    public AbstractJob(final CitizenData entity)
+    public AbstractJob(final ICitizenData entity)
     {
         citizen = entity;
     }
@@ -111,10 +112,10 @@ public abstract class AbstractJob implements IJob
      * @return New Job created from the data, or null.
      */
     @Nullable
-    public static AbstractJob createFromNBT(final CitizenData citizen, @NotNull final NBTTagCompound compound)
+    public static IJob createFromNBT(final ICitizenData citizen, @NotNull final NBTTagCompound compound)
     {
-        @Nullable AbstractJob job = null;
-        @Nullable Class<? extends AbstractJob> oclass = null;
+        @Nullable IJob job = null;
+        @Nullable Class<? extends IJob> oclass = null;
 
         try
         {
@@ -122,7 +123,7 @@ public abstract class AbstractJob implements IJob
 
             if (oclass != null)
             {
-                final Constructor<?> constructor = oclass.getDeclaredConstructor(CitizenData.class);
+                final Constructor<?> constructor = oclass.getDeclaredConstructor(ICitizenData.class);
                 job = (AbstractJob) constructor.newInstance(citizen);
             }
         }
@@ -180,7 +181,7 @@ public abstract class AbstractJob implements IJob
      * @return CitizenData that owns this Job.
      */
     @Override
-    public CitizenData getCitizen()
+    public ICitizenData getCitizen()
     {
         return citizen;
     }
@@ -245,7 +246,7 @@ public abstract class AbstractJob implements IJob
     @Override
     public void addTasks(@NotNull final EntityAITasks tasks)
     {
-        final AbstractAISkeleton<? extends AbstractJob> aiTask = generateAI();
+        final AbstractAISkeleton<? extends IJob> aiTask = generateAI();
         if (aiTask != null)
         {
             tasks.addTask(TASK_PRIORITY, aiTask);

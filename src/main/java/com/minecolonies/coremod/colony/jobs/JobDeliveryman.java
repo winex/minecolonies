@@ -1,10 +1,10 @@
 package com.minecolonies.coremod.colony.jobs;
 
 import com.minecolonies.api.client.render.Model;
+import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.entity.ai.basic.AbstractAISkeleton;
 import com.minecolonies.api.util.BlockPosUtil;
-import com.minecolonies.coremod.colony.CitizenData;
 import com.minecolonies.coremod.entity.ai.citizen.deliveryman.EntityAIWorkDeliveryman;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
@@ -23,7 +23,7 @@ public class JobDeliveryman extends AbstractJob
      *
      * @param entity the citizen who becomes a deliveryman
      */
-    public JobDeliveryman(final CitizenData entity)
+    public JobDeliveryman(final ICitizenData entity)
     {
         super(entity);
     }

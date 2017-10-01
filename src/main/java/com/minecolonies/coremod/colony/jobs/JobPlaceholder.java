@@ -1,7 +1,7 @@
 package com.minecolonies.coremod.colony.jobs;
 
+import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.entity.ai.basic.AbstractAISkeleton;
-import com.minecolonies.coremod.colony.CitizenData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +16,7 @@ public class JobPlaceholder extends AbstractJob
      *
      * @param entity the entity.
      */
-    public JobPlaceholder(final CitizenData entity)
+    public JobPlaceholder(final ICitizenData entity)
     {
         super(entity);
     }

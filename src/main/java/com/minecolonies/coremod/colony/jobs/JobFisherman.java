@@ -1,9 +1,9 @@
 package com.minecolonies.coremod.colony.jobs;
 
 import com.minecolonies.api.client.render.Model;
+import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.entity.ai.basic.AbstractAISkeleton;
 import com.minecolonies.api.util.BlockPosUtil;
-import com.minecolonies.coremod.colony.CitizenData;
 import com.minecolonies.coremod.entity.ai.citizen.fisherman.EntityAIWorkFisherman;
 import com.minecolonies.coremod.sounds.FishermanSounds;
 import net.minecraft.nbt.NBTTagCompound;
@@ -48,7 +48,7 @@ public class JobFisherman extends AbstractJob
      *
      * @param entity The entity which will use this job class.
      */
-    public JobFisherman(final CitizenData entity)
+    public JobFisherman(final ICitizenData entity)
     {
         super(entity);
     }

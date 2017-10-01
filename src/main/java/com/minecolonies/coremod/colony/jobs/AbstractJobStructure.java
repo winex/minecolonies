@@ -1,6 +1,6 @@
 package com.minecolonies.coremod.colony.jobs;
 
-import com.minecolonies.coremod.colony.CitizenData;
+import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.coremod.util.StructureWrapper;
 
 /**
@@ -18,7 +18,7 @@ public abstract class AbstractJobStructure extends AbstractJob
      *
      * @param entity the citizen data.
      */
-    public AbstractJobStructure(final CitizenData entity)
+    public AbstractJobStructure(final ICitizenData entity)
     {
         super(entity);
     }

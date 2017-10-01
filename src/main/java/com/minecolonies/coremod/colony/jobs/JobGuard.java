@@ -1,9 +1,10 @@
 package com.minecolonies.coremod.colony.jobs;
 
 import com.minecolonies.api.client.render.Model;
+import com.minecolonies.api.colony.ICitizenData;
+import com.minecolonies.api.colony.buildings.IBuilding;
+import com.minecolonies.api.colony.jobs.IJob;
 import com.minecolonies.api.entity.ai.basic.AbstractAISkeleton;
-import com.minecolonies.coremod.colony.CitizenData;
-import com.minecolonies.coremod.colony.buildings.AbstractBuilding;
 import com.minecolonies.coremod.colony.buildings.BuildingGuardTower;
 import com.minecolonies.coremod.entity.ai.citizen.guard.EntityAIMeleeGuard;
 import com.minecolonies.coremod.entity.ai.citizen.guard.EntityAIRangeGuard;
@@ -26,7 +27,7 @@ public class JobGuard extends AbstractJob
      *
      * @param entity the entity to assign to the job.
      */
-    public JobGuard(final CitizenData entity)
+    public JobGuard(final ICitizenData entity)
     {
         super(entity);
     }
@@ -43,9 +44,9 @@ public class JobGuard extends AbstractJob
      */
     @NotNull
     @Override
-    public AbstractAISkeleton<? extends AbstractJob> generateAI()
+    public AbstractAISkeleton<? extends IJob> generateAI()
     {
-        final AbstractBuilding building = getCitizen().getWorkBuilding();
+        final IBuilding building = getCitizen().getWorkBuilding();
         if (building instanceof BuildingGuardTower)
         {
             final BuildingGuardTower.GuardJob job = ((BuildingGuardTower) building).getJob();
@@ -62,7 +63,7 @@ public class JobGuard extends AbstractJob
     @Override
     public Model getModel()
     {
-        final AbstractBuilding building = getCitizen().getWorkBuilding();
+        final IBuilding building = getCitizen().getWorkBuilding();
         if (building instanceof BuildingGuardTower)
         {
             BuildingGuardTower.GuardJob job = ((BuildingGuardTower) building).getJob();

@@ -1,8 +1,8 @@
 package com.minecolonies.coremod.colony.jobs;
 
 import com.minecolonies.api.client.render.Model;
+import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.entity.ai.basic.AbstractAISkeleton;
-import com.minecolonies.coremod.colony.CitizenData;
 import com.minecolonies.coremod.entity.ai.citizen.lumberjack.EntityAIWorkLumberjack;
 import com.minecolonies.coremod.entity.ai.citizen.lumberjack.Tree;
 import net.minecraft.nbt.NBTTagCompound;
@@ -26,7 +26,7 @@ public class JobLumberjack extends AbstractJob
      *
      * @param entity the lumberjack.
      */
-    public JobLumberjack(final CitizenData entity)
+    public JobLumberjack(final ICitizenData entity)
     {
         super(entity);
     }

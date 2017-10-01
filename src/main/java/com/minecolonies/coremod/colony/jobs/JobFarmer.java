@@ -1,8 +1,8 @@
 package com.minecolonies.coremod.colony.jobs;
 
 import com.minecolonies.api.client.render.Model;
+import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.entity.ai.basic.AbstractAISkeleton;
-import com.minecolonies.coremod.colony.CitizenData;
 import com.minecolonies.coremod.entity.ai.citizen.farmer.EntityAIWorkFarmer;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +16,7 @@ public class JobFarmer extends AbstractJob
      *
      * @param entity the entity to assign to the job.
      */
-    public JobFarmer(final CitizenData entity)
+    public JobFarmer(final ICitizenData entity)
     {
         super(entity);
     }

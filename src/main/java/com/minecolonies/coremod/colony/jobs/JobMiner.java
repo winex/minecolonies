@@ -1,8 +1,8 @@
 package com.minecolonies.coremod.colony.jobs;
 
 import com.minecolonies.api.client.render.Model;
+import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.entity.ai.basic.AbstractAISkeleton;
-import com.minecolonies.coremod.colony.CitizenData;
 import com.minecolonies.coremod.entity.ai.citizen.miner.EntityAIStructureMiner;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +16,7 @@ public class JobMiner extends AbstractJobStructure
      *
      * @param entity the entity to add the job to.
      */
-    public JobMiner(final CitizenData entity)
+    public JobMiner(final ICitizenData entity)
     {
         super(entity);
     }

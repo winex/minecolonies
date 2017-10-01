@@ -2,8 +2,8 @@ package com.minecolonies.coremod.colony;
 
 import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.colony.IColony;
+import com.minecolonies.api.colony.buildings.IBuilding;
 import com.minecolonies.api.colony.jobs.IJob;
-import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.api.entity.Citizen;
 import com.minecolonies.api.util.BlockPosUtil;
 import io.netty.buffer.ByteBuf;
@@ -45,15 +45,15 @@ public class CitizenDataView implements ICitizenData
     /**
      * Job identifier.
      */
-    private String job;
+    private IJob job;
 
     /**
      * Working and home position.
      */
     @Nullable
-    private BlockPos homeBuilding;
+    private IBuilding homeBuilding;
     @Nullable
-    private BlockPos workBuilding;
+    private IBuilding workBuilding;
 
     /**
      * Set View id.
@@ -145,7 +145,7 @@ public class CitizenDataView implements ICitizenData
      * @return the work coordinates.
      */
     @Nullable
-    public BlockPos getWorkBuilding()
+    public IBuilding getWorkBuilding()
     {
         return workBuilding;
     }
@@ -155,7 +155,7 @@ public class CitizenDataView implements ICitizenData
      *
      * @return the job as a string.
      */
-    public String getJob()
+    public IJob getJob()
     {
         return job;
     }
@@ -274,7 +274,7 @@ public class CitizenDataView implements ICitizenData
      * @return the home coordinates.
      */
     @Nullable
-    public BlockPos getHomeBuilding()
+    public IBuilding getHomeBuilding()
     {
         return homeBuilding;
     }

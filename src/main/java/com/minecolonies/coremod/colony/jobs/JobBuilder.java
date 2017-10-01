@@ -1,8 +1,9 @@
 package com.minecolonies.coremod.colony.jobs;
 
 import com.minecolonies.api.client.render.Model;
+import com.minecolonies.api.colony.ICitizenData;
+import com.minecolonies.api.colony.buildings.IBuilding;
 import com.minecolonies.api.entity.ai.basic.AbstractAISkeleton;
-import com.minecolonies.coremod.colony.CitizenData;
 import com.minecolonies.coremod.colony.buildings.AbstractBuilding;
 import com.minecolonies.coremod.colony.buildings.BuildingBuilder;
 import com.minecolonies.coremod.colony.workorders.AbstractWorkOrderBuild;
@@ -32,7 +33,7 @@ public class JobBuilder extends AbstractJobStructure
      *
      * @param entity citizen.
      */
-    public JobBuilder(final CitizenData entity)
+    public JobBuilder(final ICitizenData entity)
     {
         super(entity);
     }
@@ -145,7 +146,7 @@ public class JobBuilder extends AbstractJobStructure
      */
     private void resetNeededItems()
     {
-        final AbstractBuilding workerBuilding = this.getCitizen().getWorkBuilding();
+        final IBuilding workerBuilding = this.getCitizen().getWorkBuilding();
         if (workerBuilding instanceof BuildingBuilder)
         {
             ((BuildingBuilder) workerBuilding).resetNeededResources();
