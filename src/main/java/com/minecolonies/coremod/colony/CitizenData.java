@@ -4,6 +4,7 @@ import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.buildings.IBuilding;
 import com.minecolonies.api.colony.jobs.IJob;
+import com.minecolonies.api.colony.requestsystem.StandardFactoryController;
 import com.minecolonies.api.configuration.Configurations;
 import com.minecolonies.api.entity.Citizen;
 import com.minecolonies.api.entity.ai.basic.AbstractAISkeleton;
@@ -499,7 +500,7 @@ public class CitizenData implements ICitizenData
         catch (final RuntimeException ex)
         {
             Log.getLogger().error(String.format("A CitizenData.View for #%d has thrown an exception during loading, its state cannot be restored. Report this to the mod author",
-              citizenDataView.getID()), ex);
+              citizenDataView.getId()), ex);
             citizenDataView = null;
         }
 
@@ -686,6 +687,9 @@ public class CitizenData implements ICitizenData
         buf.writeBoolean(female);
 
         buf.writeInt(entity != null ? entity.getEntityId() : -1);
+
+        buf.writeInt(colony.getWorld().provider.getDimension());
+        ByteBufUtils.writeTag(buf, StandardFactoryController.getInstance().serialize(colony.getID()));
 
         buf.writeBoolean(homeBuilding != null);
         if (homeBuilding != null)

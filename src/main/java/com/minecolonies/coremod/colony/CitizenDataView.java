@@ -1,13 +1,18 @@
 package com.minecolonies.coremod.colony;
 
+import com.minecolonies.api.IAPI;
 import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.buildings.IBuilding;
 import com.minecolonies.api.colony.jobs.IJob;
+import com.minecolonies.api.colony.requestsystem.StandardFactoryController;
+import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.api.entity.Citizen;
 import com.minecolonies.api.util.BlockPosUtil;
+import com.minecolonies.coremod.colony.jobs.AbstractJob;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,6 +51,10 @@ public class CitizenDataView implements ICitizenData
      * Job identifier.
      */
     private IJob job;
+
+    private int dimensionId;
+
+    private IColony colony;
 
     /**
      * Working and home position.
@@ -310,8 +319,13 @@ public class CitizenDataView implements ICitizenData
         female = buf.readBoolean();
         entityId = buf.readInt();
 
-        homeBuilding = buf.readBoolean() ? BlockPosUtil.readFromByteBuf(buf) : null;
-        workBuilding = buf.readBoolean() ? BlockPosUtil.readFromByteBuf(buf) : null;
+        dimensionId = buf.readInt();
+        final World world = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(dimensionId);
+        final IToken colonyId = StandardFactoryController.getInstance().deserialize(ByteBufUtils.readTag(buf));
+        colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(world).getColony(colonyId);
+
+        homeBuilding = buf.readBoolean() ? colony.getBuilding(BlockPosUtil.readFromByteBuf(buf)) : null;
+        workBuilding = buf.readBoolean() ? colony.getBuilding(BlockPosUtil.readFromByteBuf(buf)) : null;
 
         //  Attributes
         level = buf.readInt();
@@ -326,6 +340,6 @@ public class CitizenDataView implements ICitizenData
         dexterity = buf.readInt();
         saturation = buf.readDouble();
 
-        job = ByteBufUtils.readUTF8String(buf);
+        job = AbstractJob.createFromNBT(this, ByteBufUtils.readTag(buf));
     }
 }
