@@ -1,7 +1,8 @@
 package com.minecolonies.coremod.commands;
 
+import com.minecolonies.api.IAPI;
 import com.minecolonies.api.colony.IColony;
-import com.minecolonies.api.colony.management.ColonyManager;
+import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.coremod.colony.Colony;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -50,20 +51,20 @@ public abstract class AbstractCitizensCommands extends AbstractSingleCommand
         }
 
         boolean firstArgumentColonyId = true;
-        int colonyId = -1;
+        IToken colonyId = null;
         if (args.length >= 2)
         {
-            colonyId = getIthArgument(args, 0, -1);
-            if (colonyId == -1)
+            colonyId = getIthArgument(args, 0, null);
+            if (colonyId == null)
             {
                 firstArgumentColonyId = false;
             }
         }
 
-        final Colony colony;
-        if (sender instanceof EntityPlayer && colonyId == -1)
+        final IColony colony;
+        if (sender instanceof EntityPlayer && colonyId == null)
         {
-            final IColony tempColony = ColonyManager.getColonyByOwner(sender.getEntityWorld(), (EntityPlayer) sender);
+            final IColony tempColony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColonyByOwner((EntityPlayer) sender);
             if (tempColony != null)
             {
                 colonyId = tempColony.getID();
@@ -71,7 +72,12 @@ public abstract class AbstractCitizensCommands extends AbstractSingleCommand
             }
         }
 
-        colony = ColonyManager.getColony(colonyId);
+        if(colonyId == null)
+        {
+            return;
+        }
+
+        colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColony(colonyId);
 
         if (colony == null)
         {
@@ -132,7 +138,7 @@ public abstract class AbstractCitizensCommands extends AbstractSingleCommand
      * @param args                  the arguments.
      * @return the valid id or -1 if not found.
      */
-    private static int getValidCitizenId(final Colony colony, final boolean firstArgumentColonyId, final String... args)
+    private static int getValidCitizenId(final IColony colony, final boolean firstArgumentColonyId, final String... args)
     {
         int offset = 0;
         if (firstArgumentColonyId)
@@ -166,5 +172,5 @@ public abstract class AbstractCitizensCommands extends AbstractSingleCommand
      * @param colonyId  the id for the colony
      * @param citizenId the id for the citizen
      */
-    abstract void executeSpecializedCode(@NotNull final MinecraftServer server, final ICommandSender sender, final Colony colonyId, final int citizenId);
+    abstract void executeSpecializedCode(@NotNull final MinecraftServer server, final ICommandSender sender, final IColony colonyId, final int citizenId);
 }

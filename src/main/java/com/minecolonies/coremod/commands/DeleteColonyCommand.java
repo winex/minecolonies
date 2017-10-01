@@ -1,8 +1,9 @@
 package com.minecolonies.coremod.commands;
 
+import com.minecolonies.api.IAPI;
 import com.minecolonies.api.colony.IColony;
-import com.minecolonies.api.colony.management.ColonyManager;
 import com.minecolonies.api.colony.permissions.Rank;
+import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.coremod.colony.Colony;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.CommandException;
@@ -41,21 +42,6 @@ public class DeleteColonyCommand extends AbstractSingleCommand
     }
 
     @NotNull
-    private static UUID getUUIDFromName(@NotNull final ICommandSender sender, @NotNull final String... args)
-    {
-        final MinecraftServer tempServer = sender.getEntityWorld().getMinecraftServer();
-        if (tempServer != null)
-        {
-            final GameProfile profile = tempServer.getPlayerProfileCache().getGameProfileForUsername(args[0]);
-            if (profile != null)
-            {
-                return profile.getId();
-            }
-        }
-        return null;
-    }
-
-    @NotNull
     @Override
     public String getCommandUsage(@NotNull final ICommandSender sender)
     {
@@ -63,22 +49,22 @@ public class DeleteColonyCommand extends AbstractSingleCommand
     }
 
     @Override
-    public boolean canRankUseCommand(@NotNull final Colony colony, @NotNull final EntityPlayer player)
+    public boolean canRankUseCommand(@NotNull final IColony colony, @NotNull final EntityPlayer player)
     {
-        return colony.getPermissions().getRank(player).equals(Rank.OWNER);
+        return colony.getPermissions().getRank(player.getUniqueID()).equals(Rank.OWNER);
     }
 
     @Override
     public void execute(@NotNull final MinecraftServer server, @NotNull final ICommandSender sender, @NotNull final String... args) throws CommandException
     {
-        final int colonyId;
+        final IToken colonyId;
 
         if (args.length == 0)
         {
             IColony colony = null;
             if (sender instanceof EntityPlayer)
             {
-                colony = ColonyManager.getColonyByOwner(((EntityPlayer) sender).world, (EntityPlayer) sender);
+                colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColonyByOwner((EntityPlayer) sender);
             }
 
             if (colony == null)
@@ -90,8 +76,9 @@ public class DeleteColonyCommand extends AbstractSingleCommand
         }
         else
         {
-            colonyId = getIthArgument(args, 0, -1);
+            colonyId = getIthArgument(args, 0, null);
         }
+
 
         final Colony colony = ColonyManager.getColony(colonyId);
         if (colony == null)

@@ -1,6 +1,6 @@
 package com.minecolonies.coremod.commands;
 
-import com.minecolonies.api.colony.management.ColonyManager;
+import com.minecolonies.api.IAPI;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
@@ -39,14 +39,16 @@ public class BackupCommand extends AbstractSingleCommand
         {
             server.addScheduledTask(() ->
             {
-                if (ColonyManager.backupColonyData())
+                //todo we should back up our data here!
+                IAPI.Holder.getApi().getColonyManager();
+                /*if (ColonyManager.backupColonyData())
                 {
                     sender.sendMessage(new TextComponentString(BACKUP_SUCCESS_MESSAGE));
                 }
                 else
                 {
                     sender.sendMessage(new TextComponentString(BACKUP_FAILURE_MESSAGE));
-                }
+                }*/
             });
         }
         else

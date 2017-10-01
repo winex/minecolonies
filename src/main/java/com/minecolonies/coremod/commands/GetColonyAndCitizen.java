@@ -1,6 +1,8 @@
 package com.minecolonies.coremod.commands;
 
-import com.minecolonies.api.colony.management.ColonyManager;
+import com.minecolonies.api.IAPI;
+import com.minecolonies.api.colony.IColony;
+import com.minecolonies.api.colony.requestsystem.token.IToken;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,9 +44,9 @@ public final class GetColonyAndCitizen
      * @param args    The arguments.
      * @return Return colony ID.
      */
-    public static int getColonyId(@NotNull final UUID mayorID, @NotNull final World world, @NotNull final String... args)
+    public static IToken getColonyId(@NotNull final UUID mayorID, @NotNull final World world, @NotNull final String... args)
     {
-        int colonyId;
+        IToken colonyId;
         if (args.length == NORMAL_ARGUMENT_LENGTH || args.length == ID_AND_NAME_ARGUMENT_LENGTH)
         {
             try
@@ -58,13 +60,14 @@ public final class GetColonyAndCitizen
         }
         else if (args.length == SHORT_ARGUMENT_LENGTH || args.length == NAME_ARGUMENT_LENGTH)
         {
-            if (ColonyManager.getColonyByOwner(world, mayorID) == null)
+            final IColony colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(world).getColonyByOwner(mayorID);
+            if (colony == null)
             {
                 throw new IllegalArgumentException(NO_COLONY);
             }
             else
             {
-                colonyId = ColonyManager.getColonyByOwner(world, mayorID).getID();
+                colonyId = colony.getID();
             }
         }
         else if (args.length >= TOO_MANY_ARGUMENTS_LENGTH)
@@ -75,11 +78,11 @@ public final class GetColonyAndCitizen
         {
             throw new IllegalArgumentException(UNKNOWN_ERROR);
         }
-        if (colonyId >= 0 && ColonyManager.getColony(colonyId) == null)
+
+        if (colonyId != null && IAPI.Holder.getApi().getColonyManager().getControllerForWorld(world).getColony(colonyId) == null)
         {
             throw new IllegalArgumentException(String.format(NOT_FOUND, "Colony"));
         }
-
 
         return colonyId;
     }
@@ -88,14 +91,23 @@ public final class GetColonyAndCitizen
      * Getting the citizen ID.
      *
      * @param colonyId The colony ID for getting the citizen ID
+     * @param world the world.
      * @param args     The given arguments
      * @return Returns citizen ID
      */
-    public static int getCitizenId(@NotNull int colonyId, @NotNull final String... args)
+    public static int getCitizenId(@NotNull final IToken colonyId, final World world, @NotNull final String... args)
     {
         int citizenId;
         String citizenName;
         citizenId = STANDARD_CITIZEN_ID;
+
+        if(colonyId == null)
+        {
+            return citizenId;
+        }
+
+        final IColony colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(world).getColony(colonyId);
+
         if (args.length == NORMAL_ARGUMENT_LENGTH)
         {
             try
@@ -118,24 +130,23 @@ public final class GetColonyAndCitizen
                 throw new IllegalArgumentException(String.format(ONLY_NUMBERS, "citizen"));
             }
         }
-        else if (args.length == NAME_ARGUMENT_LENGTH && colonyId >= 0)
+        else if (args.length == NAME_ARGUMENT_LENGTH)
         {
             citizenName = args[ARGUMENT_ZERO] + " " + args[ARGUMENT_ONE] + " " + args[ARGUMENT_TWO];
-            for (int i = 1
-                   ; i <= ColonyManager.getColony(colonyId).getCitizens().size(); i++)
+            for (int i = 1; i <= colony.getCitizens().size(); i++)
             {
-                if (ColonyManager.getColony(colonyId).getCitizen(i).getName() != null && ColonyManager.getColony(colonyId).getCitizen(i).getName().equals(citizenName))
+                if (colony.getCitizen(i).getName() != null && colony.getCitizen(i).getName().equals(citizenName))
                 {
                     citizenId = i;
                 }
             }
         }
-        else if (args.length == ID_AND_NAME_ARGUMENT_LENGTH && colonyId >= 0)
+        else if (args.length == ID_AND_NAME_ARGUMENT_LENGTH)
         {
             citizenName = args[ARGUMENT_ONE] + " " + args[ARGUMENT_TWO] + " " + args[ARGUMENT_THREE];
-            for (int i = 1; i <= ColonyManager.getColony(colonyId).getCitizens().size(); i++)
+            for (int i = 1; i <= colony.getCitizens().size(); i++)
             {
-                if (ColonyManager.getColony(colonyId).getCitizen(i).getName().equals(citizenName))
+                if (colony.getCitizen(i).getName().equals(citizenName))
                 {
                     citizenId = i;
                 }
@@ -149,7 +160,7 @@ public final class GetColonyAndCitizen
         {
             throw new IllegalArgumentException(UNKNOWN_ERROR);
         }
-        if (citizenId >= 0 && colonyId >= 0 && ColonyManager.getColony(colonyId).getCitizen(citizenId) == null)
+        if (citizenId >= 0 && colony.getCitizen(citizenId) == null)
         {
             throw new IllegalArgumentException(String.format(NOT_FOUND, "Citizen"));
         }

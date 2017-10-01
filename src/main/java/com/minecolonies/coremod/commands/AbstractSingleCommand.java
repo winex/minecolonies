@@ -1,9 +1,10 @@
 package com.minecolonies.coremod.commands;
 
-import com.minecolonies.api.colony.management.ColonyManager;
+import com.minecolonies.api.IAPI;
+import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.permissions.Rank;
+import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.api.configuration.Configurations;
-import com.minecolonies.coremod.colony.Colony;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -53,6 +54,31 @@ public abstract class AbstractSingleCommand implements ISubCommand
         }
     }
 
+    /**
+     * Get the ith argument (An Integer).
+     *
+     * @param i    the argument from the list you want.
+     * @param args the list of arguments.
+     * @param def  the default value.
+     * @return the argument.
+     */
+    public static IToken getIthArgument(final String[] args, final int i, final IToken def)
+    {
+        if (args.length <= i)
+        {
+            return def;
+        }
+
+        try
+        {
+            return Integer.parseInt(args[i]);
+        }
+        catch (final NumberFormatException e)
+        {
+            return def;
+        }
+    }
+
     @NotNull
     @Override
     public String getCommandUsage(@NotNull final ICommandSender sender)
@@ -75,14 +101,14 @@ public abstract class AbstractSingleCommand implements ISubCommand
      * @return boolean.
      */
 
-    public boolean canPlayerUseCommand(final EntityPlayer player, final Commands theCommand, final int colonyId)
+    public boolean canPlayerUseCommand(final EntityPlayer player, final Commands theCommand, final IToken colonyId)
     {
         if (isPlayerOpped(player, theCommand.toString()))
         {
             return true;
         }
 
-        final Colony chkColony = ColonyManager.getColony(colonyId);
+        final IColony chkColony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(player.getEntityWorld()).getColony(colonyId);
         if (chkColony == null)
         {
             return false;
@@ -156,9 +182,9 @@ public abstract class AbstractSingleCommand implements ISubCommand
      * @param player the player.
      * @return true if so.
      */
-    public boolean canRankUseCommand(@NotNull final Colony colony, @NotNull final EntityPlayer player)
+    public boolean canRankUseCommand(@NotNull final IColony colony, @NotNull final EntityPlayer player)
     {
-        return colony.getPermissions().getRank(player).equals(Rank.OFFICER) || colony.getPermissions().getRank(player).equals(Rank.OWNER);
+        return colony.getPermissions().getRank(player.getUniqueID()).equals(Rank.OFFICER) || colony.getPermissions().getRank(player.getUniqueID()).equals(Rank.OWNER);
     }
 
     enum Commands

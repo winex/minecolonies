@@ -1,7 +1,8 @@
 package com.minecolonies.coremod.commands;
 
+import com.minecolonies.api.IAPI;
 import com.minecolonies.api.colony.IColony;
-import com.minecolonies.api.colony.management.ColonyManager;
+import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.coremod.colony.Colony;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -54,25 +55,29 @@ public class ShowColonyInfoCommand extends AbstractSingleCommand
     @Override
     public void execute(@NotNull final MinecraftServer server, @NotNull final ICommandSender sender, @NotNull final String... args) throws CommandException
     {
-        int colonyId;
-        colonyId = getIthArgument(args, 0, -1);
-        IColony tempColony = ColonyManager.getColony(colonyId);
+        IToken colonyId = getIthArgument(args, 0, null);
+        IColony tempColony = null;
 
-        if (colonyId == -1 && args.length >= 1)
+        if(colonyId != null)
+        {
+            tempColony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColony(colonyId);
+        }
+
+        if (colonyId == null && args.length >= 1)
         {
             final EntityPlayer player = server.getEntityWorld().getPlayerEntityByName(args[0]);
             if (player != null)
             {
-                tempColony = ColonyManager.getColonyByOwner(server.getEntityWorld(), player);
+                tempColony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColonyByOwner(player);
             }
         }
 
         if (sender instanceof EntityPlayer)
         {
             final UUID mayorID = sender.getCommandSenderEntity().getUniqueID();
-            if (tempColony == null)
+            if (colonyId == null)
             {
-                tempColony = ColonyManager.getColonyByOwner(sender.getEntityWorld(), mayorID);
+                tempColony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColonyByOwner(mayorID);
             }
 
             final EntityPlayer player = (EntityPlayer) sender;
@@ -86,7 +91,7 @@ public class ShowColonyInfoCommand extends AbstractSingleCommand
 
         if (tempColony == null)
         {
-            if (colonyId == -1 && args.length != 0)
+            if (colonyId == null && args.length != 0)
             {
                 sender.sendMessage(new TextComponentString(String.format(NO_COLONY_FOUND_MESSAGE, args[0])));
             }
@@ -97,25 +102,15 @@ public class ShowColonyInfoCommand extends AbstractSingleCommand
             return;
         }
 
-        final Colony colony = ColonyManager.getColony(tempColony.getID());
-        if (colony == null)
+        final BlockPos position = tempColony.getCenter();
+        sender.sendMessage(new TextComponentString(ID_TEXT + tempColony.getID() + NAME_TEXT + tempColony.getName()));
+
+        if(tempColony instanceof Colony)
         {
-            if (colonyId == -1 && args.length != 0)
-            {
-                sender.sendMessage(new TextComponentString(String.format(NO_COLONY_FOUND_MESSAGE, args[0])));
-            }
-            else
-            {
-                sender.sendMessage(new TextComponentString(String.format(NO_COLONY_FOUND_MESSAGE_ID, colonyId)));
-            }
-            return;
+            final String mayor = ((Colony) tempColony).getPermissions().getOwnerName();
+            sender.sendMessage(new TextComponentString(MAYOR_TEXT + mayor));
         }
-
-        final BlockPos position = colony.getCenter();
-        sender.sendMessage(new TextComponentString(ID_TEXT + colony.getID() + NAME_TEXT + colony.getName()));
-        final String mayor = colony.getPermissions().getOwnerName();
-        sender.sendMessage(new TextComponentString(MAYOR_TEXT + mayor));
-        sender.sendMessage(new TextComponentString(CITIZENS + colony.getCitizens().size() + "/" + colony.getMaxCitizens()));
+        sender.sendMessage(new TextComponentString(CITIZENS + tempColony.getCitizens().size() + "/" + tempColony.getMaxCitizens()));
         sender.sendMessage(new TextComponentString(COORDINATES_TEXT + String.format(COORDINATES_XYZ, position.getX(), position.getY(), position.getZ())));
     }
 

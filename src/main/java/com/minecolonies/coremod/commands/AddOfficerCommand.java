@@ -1,7 +1,6 @@
 package com.minecolonies.coremod.commands;
 
 import com.minecolonies.api.colony.IColony;
-import com.minecolonies.api.colony.management.ColonyManager;
 import com.minecolonies.api.colony.permissions.Rank;
 import com.minecolonies.coremod.colony.Colony;
 import net.minecraft.command.CommandException;

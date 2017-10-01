@@ -1,7 +1,8 @@
 package com.minecolonies.coremod.commands;
 
+import com.minecolonies.api.IAPI;
 import com.minecolonies.api.colony.IColony;
-import com.minecolonies.api.colony.management.ColonyManager;
+import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.coremod.colony.CitizenData;
 import com.minecolonies.coremod.colony.Colony;
 import net.minecraft.command.CommandException;
@@ -61,7 +62,7 @@ public class ListCitizensCommand extends AbstractSingleCommand
     @Override
     public void execute(@NotNull final MinecraftServer server, @NotNull final ICommandSender sender, @NotNull final String... args) throws CommandException
     {
-        final int colonyId = getIthArgument(args, 0, getColonyId(sender));
+        final IToken colonyId = getIthArgument(args, 0, getColonyId(sender));
 
         if (sender instanceof EntityPlayer)
         {
@@ -73,7 +74,7 @@ public class ListCitizensCommand extends AbstractSingleCommand
             }
         }
 
-        final Colony colony = ColonyManager.getColony(colonyId);
+        final IColony colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColony(colonyId);
 
         final List<CitizenData> citizens = new ArrayList<>(colony.getCitizens().values());
         final int citizenCount = citizens.size();
@@ -128,19 +129,15 @@ public class ListCitizensCommand extends AbstractSingleCommand
      * @param sender the sender of the command.
      * @return the colonyId.
      */
-    private static int getColonyId(@NotNull final ICommandSender sender)
+    private static IToken getColonyId(@NotNull final ICommandSender sender)
     {
-        final IColony tempColony = ColonyManager.getColonyByOwner(sender.getEntityWorld(), sender.getCommandSenderEntity().getUniqueID());
-        if (tempColony != null)
+        final IColony tempColony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColonyByOwner((EntityPlayer) sender);
+        if (tempColony instanceof Colony)
         {
-            final Colony colony = ColonyManager.getColony(sender.getEntityWorld(), tempColony.getCenter());
-            if (colony != null)
-            {
-                return colony.getID();
-            }
+            return tempColony.getID();
         }
 
-        return 1;
+        return null;
     }
 
     /**

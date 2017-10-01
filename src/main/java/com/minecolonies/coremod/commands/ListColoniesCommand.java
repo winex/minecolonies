@@ -1,6 +1,6 @@
 package com.minecolonies.coremod.commands;
 
-import com.minecolonies.api.colony.management.ColonyManager;
+import com.minecolonies.api.IAPI;
 import com.minecolonies.coremod.colony.Colony;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -59,7 +59,7 @@ public class ListColoniesCommand extends AbstractSingleCommand
     public void execute(@NotNull final MinecraftServer server, @NotNull final ICommandSender sender, @NotNull final String... args) throws CommandException
     {
         int page = 1;
-        final List<Colony> colonies = ColonyManager.getColonies();
+        final List<Colony> colonies = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColonies();
         final int colonyCount = colonies.size();
 
         // check to see if we have to add one page to show the half page
