@@ -88,4 +88,12 @@ public class StandardTokenFactory implements ITokenFactory<UUID, StandardToken>
     {
         return new StandardToken(input);
     }
+
+    @NotNull
+    @Override
+    public StandardToken getInstanceFromString(@NotNull final String input)
+    {
+        UUID token = UUID.fromString(input);
+        return getNewInstance(token);
+    }
 }

@@ -31,6 +31,11 @@ public interface ITokenFactory<T, RT extends IToken<T>> extends IFactory<T, RT>
             throw new IllegalArgumentException("Unsupported context - Too many parameters. None is needed.!");
         }
 
+        if (context[1] instanceof String)
+        {
+            return getInstanceFromString((String) context[1]);
+        }
+
         return this.getNewInstance(t);
     }
 
@@ -42,4 +47,13 @@ public interface ITokenFactory<T, RT extends IToken<T>> extends IFactory<T, RT>
      */
     @NotNull
     RT getNewInstance(@NotNull T input);
+
+    /**
+     * Method to get a new instance of a token from a String.
+     *
+     * @param input The string to generate and parse a token from.
+     * @return The IToken that is represented the string.
+     */
+    @NotNull
+    RT getInstanceFromString(@NotNull String input);
 }
