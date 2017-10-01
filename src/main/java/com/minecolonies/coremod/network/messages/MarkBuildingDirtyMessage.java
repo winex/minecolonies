@@ -3,6 +3,7 @@ package com.minecolonies.coremod.network.messages;
 import com.minecolonies.api.IAPI;
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.buildings.IBuilding;
+import com.minecolonies.api.colony.requestsystem.StandardFactoryController;
 import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.api.util.BlockPosUtil;
 import com.minecolonies.api.util.Log;
@@ -64,8 +65,7 @@ public class MarkBuildingDirtyMessage extends AbstractMessage<MarkBuildingDirtyM
     @Override
     public void fromBytes(@NotNull final ByteBuf buf)
     {
-
-        colonyId = buf.readInt();
+        colonyId = StandardFactoryController.getInstance().deserialize(ByteBufUtils.readTag(buf));
         buildingId = BlockPosUtil.readFromByteBuf(buf);
         dimensionId = buf.readInt();
     }
@@ -82,7 +82,7 @@ public class MarkBuildingDirtyMessage extends AbstractMessage<MarkBuildingDirtyM
     public void messageOnServerThread(final MarkBuildingDirtyMessage message, final EntityPlayerMP player)
     {
         final World world = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(dimensionId);
-        final IColony colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(world).getColony(message.colonyId);
+        final IColony colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(world).getColony(colonyId);
         if (colony == null)
         {
             Log.getLogger().warn("TransferItemsRequestMessage colony is null");

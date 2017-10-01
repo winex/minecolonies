@@ -3,12 +3,15 @@ package com.minecolonies.coremod.commands;
 import com.minecolonies.api.IAPI;
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.permissions.Rank;
+import com.minecolonies.api.colony.requestsystem.StandardFactoryController;
 import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.api.configuration.Configurations;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 /**
  * A command that has children. Is a single one-word command.
@@ -71,7 +74,7 @@ public abstract class AbstractSingleCommand implements ISubCommand
 
         try
         {
-            return Integer.parseInt(args[i]);
+            return StandardFactoryController.getInstance().getNewInstance(UUID.newRandom(), args[i]);
         }
         catch (final NumberFormatException e)
         {

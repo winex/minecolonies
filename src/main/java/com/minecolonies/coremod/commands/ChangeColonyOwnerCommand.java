@@ -1,7 +1,8 @@
 package com.minecolonies.coremod.commands;
 
+import com.minecolonies.api.IAPI;
 import com.minecolonies.api.colony.IColony;
-import com.minecolonies.api.colony.management.ColonyManager;
+import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.coremod.colony.Colony;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -61,8 +62,8 @@ public class ChangeColonyOwnerCommand extends AbstractSingleCommand
             return;
         }
 
-        int colonyId = getIthArgument(args, 0, -1);
-        if (colonyId == -1)
+        IToken colonyId = getIthArgument(args, 0, null);
+        if (colonyId == null)
         {
             final String playerName = args[0];
 
@@ -72,11 +73,17 @@ public class ChangeColonyOwnerCommand extends AbstractSingleCommand
                 return;
             }
             final EntityPlayer player = sender.getEntityWorld().getPlayerEntityByName(playerName);
-            final IColony colony = ColonyManager.getColonyByOwner(sender.getEntityWorld(), player.getUniqueID());
+            final IColony colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColonyByOwner(player);
+
             colonyId = colony.getID();
         }
 
-        final Colony colony = ColonyManager.getColony(colonyId);
+        if(colonyId == null)
+        {
+            return;
+        }
+
+        final IColony colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColony(colonyId);
 
         if (colony == null)
         {
@@ -103,13 +110,17 @@ public class ChangeColonyOwnerCommand extends AbstractSingleCommand
             return;
         }
 
-        if (ColonyManager.getColonyByOwner(sender.getEntityWorld(), player) != null)
+
+        if (IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColonyByOwner(player) != null)
         {
             sender.getCommandSenderEntity().sendMessage(new TextComponentString(String.format(HAS_A_COLONY, playerName)));
             return;
         }
 
-        colony.getPermissions().setOwner(player);
+        if(colony instanceof Colony)
+        {
+            ((Colony) colony).getPermissions().setOwner(player);
+        }
 
         sender.sendMessage(new TextComponentString(String.format(SUCCESS_MESSAGE, playerName, colonyId)));
     }

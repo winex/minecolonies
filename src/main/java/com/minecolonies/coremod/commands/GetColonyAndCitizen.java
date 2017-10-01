@@ -2,6 +2,7 @@ package com.minecolonies.coremod.commands;
 
 import com.minecolonies.api.IAPI;
 import com.minecolonies.api.colony.IColony;
+import com.minecolonies.api.colony.requestsystem.StandardFactoryController;
 import com.minecolonies.api.colony.requestsystem.token.IToken;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -51,7 +52,7 @@ public final class GetColonyAndCitizen
         {
             try
             {
-                colonyId = Integer.parseInt(args[ARGUMENT_ZERO]);
+                colonyId = StandardFactoryController.getInstance().getNewInstance(UUID.newRandom(), args[i]);;
             }
             catch (NumberFormatException e)
             {

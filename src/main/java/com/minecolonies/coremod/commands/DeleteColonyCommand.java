@@ -59,9 +59,10 @@ public class DeleteColonyCommand extends AbstractSingleCommand
     {
         final IToken colonyId;
 
+        IColony colony = null;
+
         if (args.length == 0)
         {
-            IColony colony = null;
             if (sender instanceof EntityPlayer)
             {
                 colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColonyByOwner((EntityPlayer) sender);
@@ -77,15 +78,18 @@ public class DeleteColonyCommand extends AbstractSingleCommand
         else
         {
             colonyId = getIthArgument(args, 0, null);
+            if(colonyId != null)
+            {
+                colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColony(colonyId);
+            }
         }
 
-
-        final Colony colony = ColonyManager.getColony(colonyId);
         if (colony == null)
         {
             sender.getCommandSenderEntity().sendMessage(new TextComponentString(NO_COLONY_FOUND_MESSAGE_ID));
             return;
         }
+        final IToken finalColonyId = colony.getID();
 
         if (sender instanceof EntityPlayer)
         {
@@ -97,7 +101,7 @@ public class DeleteColonyCommand extends AbstractSingleCommand
             }
         }
 
-        server.addScheduledTask(() -> ColonyManager.deleteColony(colony.getID()));
+        server.addScheduledTask(() -> IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).deleteColony(finalColonyId));
     }
 
     @NotNull

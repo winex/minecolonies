@@ -1,7 +1,9 @@
 package com.minecolonies.coremod.commands;
 
+import com.minecolonies.api.IAPI;
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.permissions.Rank;
+import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.coremod.colony.Colony;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -54,10 +56,10 @@ public class AddOfficerCommand extends AbstractSingleCommand
             return;
         }
 
-        int colonyId = getIthArgument(args, 0, -1);
-        if (colonyId == -1 && sender instanceof EntityPlayer)
+        IToken colonyId = getIthArgument(args, 0, null);
+        if (colonyId == null && sender instanceof EntityPlayer)
         {
-            final IColony colony = ColonyManager.getColonyByOwner(sender.getEntityWorld(), ((EntityPlayer) sender).getUniqueID());
+            final IColony colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColonyByOwner(((EntityPlayer) sender).getUniqueID());
             if (colony == null)
             {
                 sender.getCommandSenderEntity().sendMessage(new TextComponentString(COLONY_NULL));
@@ -66,7 +68,13 @@ public class AddOfficerCommand extends AbstractSingleCommand
             colonyId = colony.getID();
         }
 
-        final Colony colony = ColonyManager.getColony(colonyId);
+        if(colonyId == null)
+        {
+            sender.sendMessage(new TextComponentString(String.format(COLONY_NULL, colonyId)));
+            return;
+        }
+
+        final IColony colony = IAPI.Holder.getApi().getColonyManager().getControllerForWorld(sender.getEntityWorld()).getColony(colonyId);
 
         if (colony == null)
         {
@@ -95,7 +103,10 @@ public class AddOfficerCommand extends AbstractSingleCommand
             playerName = sender.getName();
         }
 
-        colony.getPermissions().addPlayer(playerName, Rank.OFFICER, colony.getWorld());
+        if(colony instanceof Colony)
+        {
+            ((Colony ) colony).getPermissions().addPlayer(playerName, Rank.OFFICER, colony.getWorld());
+        }
         sender.sendMessage(new TextComponentString(String.format(SUCCESS_MESSAGE, playerName, colonyId)));
     }
 
