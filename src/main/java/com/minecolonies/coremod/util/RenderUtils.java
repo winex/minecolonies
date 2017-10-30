@@ -60,7 +60,9 @@ public final class RenderUtils
     {
         /**
          * Intentionally left empty.
+         * Added exception because we can use reflections
          */
+    	throw new RuntimeException("No " + getClass().getName() + " instances are allowed!");
     }
 
     /**
@@ -79,9 +81,10 @@ public final class RenderUtils
             return;
         }
 
-        final Set<BlockPos> waypoints = colonyView.getWayPoints();
-        for (final BlockPos pos : waypoints)
+        final List<BlockPos> waypoints = colonyView.getWayPoints();
+        for(int i = 0; i < waypoints.size(); ++i)
         {
+        	BlockPos pos = waypoints.get(i);
             final EntityEnderCrystal crystal = new EntityEnderCrystal(clientWorld);
             crystal.setPosition(pos.getX() + HALF_BLOCK_OFFSET, pos.getY(), pos.getZ() + HALF_BLOCK_OFFSET);
             crystal.setBeamTarget(pos.up(FIX_POINT_OFFSET));

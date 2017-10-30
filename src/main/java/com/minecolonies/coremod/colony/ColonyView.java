@@ -1,5 +1,18 @@
 package com.minecolonies.coremod.colony;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.permissions.Action;
 import com.minecolonies.api.colony.permissions.Player;
@@ -15,16 +28,13 @@ import com.minecolonies.coremod.colony.permissions.Permissions;
 import com.minecolonies.coremod.colony.workorders.AbstractWorkOrder;
 import com.minecolonies.coremod.network.messages.PermissionsMessage;
 import com.minecolonies.coremod.network.messages.TownHallRenameMessage;
+
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
 
 /**
  * Client side representation of the Colony.
@@ -663,9 +673,9 @@ public final class ColonyView implements IColony
      * Get a list of all waypoints in the colony view.
      * @return a copy of the list.
      */
-    public Set<BlockPos> getWayPoints()
+    public List<BlockPos> getWayPoints()
     {
-        return new HashSet<>(wayPoints);
+        return new ArrayList<>(wayPoints);
     }
 
     /**

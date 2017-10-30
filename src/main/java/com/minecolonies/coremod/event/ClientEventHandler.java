@@ -1,7 +1,13 @@
 package com.minecolonies.coremod.event;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jetbrains.annotations.NotNull;
+
 import com.minecolonies.api.colony.permissions.Action;
 import com.minecolonies.api.util.constant.Constants;
+import com.minecolonies.coremod.client.CitizenTextures;
 import com.minecolonies.coremod.colony.CitizenDataView;
 import com.minecolonies.coremod.colony.ColonyManager;
 import com.minecolonies.coremod.colony.ColonyView;
@@ -11,17 +17,15 @@ import com.minecolonies.coremod.entity.pathfinding.Pathfinding;
 import com.minecolonies.coremod.util.RenderUtils;
 import com.minecolonies.structures.helpers.Settings;
 import com.minecolonies.structures.helpers.Structure;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Used to handle client events.
@@ -117,4 +121,10 @@ public class ClientEventHandler
         }
         colonyBorder.clear();
     }
+    
+    @SubscribeEvent
+	public void textureStitch(TextureStitchEvent e)
+	{
+    	CitizenTextures.refreshTextures();
+	}
 }

@@ -300,7 +300,20 @@ curseforge {
             changelogType = 'markdown'
             releaseType = System.getenv().CURSERELEASETYPE
 
-            addArtifact deobfJar
+            mainArtifact(jar) {
+				displayName = "[1.12.x] Minecolonies - " + project.version
+			}
+			
+			addArtifact(deobfJar)
+			
+			addGameVersion "1.12"
+			addGameVersion "1.12.1"
+			addGameVersion "1.12.2"
+			
+			relations {
+				optionalLibrary 'Tinkers-Construct'
+				optionalLibrary 'Guide-Book'
+			}
         }
     }
     else

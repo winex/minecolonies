@@ -8,6 +8,7 @@ import com.minecolonies.api.entity.ai.pathfinding.IWalkToProxy;
 import com.minecolonies.api.util.*;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.coremod.MineColonies;
+import com.minecolonies.coremod.client.CitizenTextures;
 import com.minecolonies.coremod.client.render.RenderBipedCitizen;
 import com.minecolonies.coremod.colony.*;
 import com.minecolonies.coremod.colony.buildings.AbstractBuilding;
@@ -1358,7 +1359,9 @@ public class EntityCitizen extends EntityAgeable implements INpc
     /**
      * Sets the textures of all citizens and distinguishes between male and
      * female.
+     * @deprecated to bind to a texture, use {@link CitizenTextures#bindTexture(com.minecolonies.coremod.client.render.RenderBipedCitizen.Model, boolean, long)} where long is {@link #getTextureId()}
      */
+    @Deprecated
     private void setTexture()
     {
         if (!CompatibilityUtils.getWorld(this).isRemote)
@@ -1623,6 +1626,16 @@ public class EntityCitizen extends EntityAgeable implements INpc
     public ResourceLocation getTexture()
     {
         return texture;
+    }
+    
+    /**
+     * Getter of the texture seed.
+     *
+     * @return the id of the texture.
+     */
+    public int getTextureId()
+    {
+        return textureId;
     }
 
     /**
