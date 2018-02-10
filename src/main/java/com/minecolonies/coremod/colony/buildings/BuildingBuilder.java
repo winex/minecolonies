@@ -364,4 +364,10 @@ public class BuildingBuilder extends AbstractBuildingWorker
     {
         return neededResources.containsKey(stack.getUnlocalizedName() + ":" + stack.getItemDamage());
     }
+
+    @Override
+    public boolean canCraftComplexRecipes()
+    {
+        return true;
+    }
 }

@@ -6,6 +6,7 @@ import com.minecolonies.blockout.Pane;
 import com.minecolonies.blockout.controls.Button;
 import com.minecolonies.blockout.controls.ButtonHandler;
 import com.minecolonies.blockout.controls.ItemIcon;
+import com.minecolonies.blockout.views.Box;
 import com.minecolonies.blockout.views.ScrollingList;
 import com.minecolonies.blockout.views.Window;
 import com.minecolonies.coremod.MineColonies;
@@ -65,6 +66,11 @@ public class WindowListRecipes extends Window implements ButtonHandler
     private static final String RESOURCE  = "resource%d";
 
     /**
+     * The item icon of the 3x3 resource.
+     */
+    private static final String RES  = "res%d";
+
+    /**
      * Contains all the recipes.
      */
     private final List<IRecipeStorage> recipes = new ArrayList<>();
@@ -112,6 +118,7 @@ public class WindowListRecipes extends Window implements ButtonHandler
         updateRecipes();
         recipeList.enable();
         recipeList.show();
+
         //Creates a dataProvider for the homeless recipeList.
         recipeList.setDataProvider(new ScrollingList.DataProvider()
         {
@@ -136,11 +143,22 @@ public class WindowListRecipes extends Window implements ButtonHandler
                 @NotNull final IRecipeStorage recipe = recipes.get(index);
                 rowPane.findPaneOfTypeByID(OUTPUT_ICON, ItemIcon.class).setItem(recipe.getPrimaryOutput());
 
-                for(int i = 0; i < recipe.getInput().size(); i++)
+                final String name;
+                if(recipe.getInput().size() < 4)
                 {
-                    rowPane.findPaneOfTypeByID(String.format(RESOURCE, i+1), ItemIcon.class).setItem(recipe.getInput().get(i));
+                    name = RESOURCE;
+                }
+                else
+                {
+                    name = RES;
+                    rowPane.findPaneOfTypeByID("3x3", Box.class).setVisible(true);
+                    rowPane.findPaneOfTypeByID("2x2", Box.class).setVisible(false);
                 }
 
+                for(int i = 0; i < recipe.getInput().size(); i++)
+                {
+                    rowPane.findPaneOfTypeByID(String.format(name, i+1), ItemIcon.class).setItem(recipe.getInput().get(i));
+                }
             }
         });
     }
