@@ -574,10 +574,7 @@ public abstract class AbstractBuildingWorker extends AbstractBuildingHut
                 new BuildingRequestResolver(getRequester().getRequesterLocation(), getColony().getRequestManager()
                         .getFactoryController().getNewInstance(TypeConstants.ITOKEN)),
                 new PrivateWorkerCraftingRequestResolver(getRequester().getRequesterLocation(), getColony().getRequestManager()
-                        .getFactoryController().getNewInstance(TypeConstants.ITOKEN)),
-                new PublicWorkerCraftingRequestResolver(getRequester().getRequesterLocation(), getColony().getRequestManager()
                         .getFactoryController().getNewInstance(TypeConstants.ITOKEN)));
-
     }
 
     /**
