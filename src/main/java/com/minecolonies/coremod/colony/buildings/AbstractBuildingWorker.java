@@ -19,6 +19,7 @@ import com.minecolonies.coremod.colony.ColonyView;
 import com.minecolonies.coremod.colony.jobs.AbstractJob;
 import com.minecolonies.coremod.colony.requestsystem.resolvers.BuildingRequestResolver;
 import com.minecolonies.coremod.colony.requestsystem.resolvers.PrivateWorkerCraftingRequestResolver;
+import com.minecolonies.coremod.colony.requestsystem.resolvers.PublicWorkerCraftingRequestResolver;
 import com.minecolonies.coremod.entity.EntityCitizen;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemFood;
@@ -573,7 +574,10 @@ public abstract class AbstractBuildingWorker extends AbstractBuildingHut
                 new BuildingRequestResolver(getRequester().getRequesterLocation(), getColony().getRequestManager()
                         .getFactoryController().getNewInstance(TypeConstants.ITOKEN)),
                 new PrivateWorkerCraftingRequestResolver(getRequester().getRequesterLocation(), getColony().getRequestManager()
+                        .getFactoryController().getNewInstance(TypeConstants.ITOKEN)),
+                new PublicWorkerCraftingRequestResolver(getRequester().getRequesterLocation(), getColony().getRequestManager()
                         .getFactoryController().getNewInstance(TypeConstants.ITOKEN)));
+
     }
 
     /**
