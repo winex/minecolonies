@@ -33,5 +33,10 @@ public class EntityAIWorkSawmill extends AbstractEntityAIInteract<JobSawmill>
         );
         worker.setSkillModifier(2 * worker.getCitizenData().getEndurance() + worker.getCitizenData().getCharisma());
         worker.setCanPickUpLoot(true);
+
+        //can then let the worker AI check what tasks are assigned to his building resolver
+        //pick the first
+        //do shit
+        //and do "complete" ?
     }
 }

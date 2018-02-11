@@ -62,7 +62,8 @@ public class WarehouseRequestResolver extends AbstractRequestResolver<IDeliverab
             try
             {
                 return wareHouses.stream().anyMatch(wareHouse -> wareHouse.hasMatchinItemStackInWarehouse(itemStack -> requestToCheck.getRequest().matches(itemStack)));
-            } catch (Exception e)
+            }
+            catch (final Exception e)
             {
                 Log.getLogger().error(e);
             }
@@ -78,8 +79,7 @@ public class WarehouseRequestResolver extends AbstractRequestResolver<IDeliverab
     /**
      * Moving the curly braces really makes the code hard to read.
      */
-    public List<IToken<?>> attemptResolve(
-                                        @NotNull final IRequestManager manager, @NotNull final IRequest<? extends IDeliverable> request)
+    public List<IToken<?>> attemptResolve(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends IDeliverable> request)
     {
         if (manager.getColony().getWorld().isRemote)
         {
@@ -140,10 +140,9 @@ public class WarehouseRequestResolver extends AbstractRequestResolver<IDeliverab
     }
 
     @Override
-    public void onRequestBeingOverruled(
-      @NotNull final IRequestManager manager, @NotNull final IRequest<? extends IDeliverable> request)
+    public void onRequestBeingOverruled(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends IDeliverable> request)
     {
-
+        //NOOP.
     }
 
     private static Set<TileEntityWareHouse> getWareHousesInColony(final Colony colony)
@@ -157,6 +156,7 @@ public class WarehouseRequestResolver extends AbstractRequestResolver<IDeliverab
     @Override
     public void onRequestComplete(@NotNull final IRequestManager manager, @NotNull final IToken<?> token)
     {
+        //NOOP.
     }
 
     @Override
@@ -170,7 +170,9 @@ public class WarehouseRequestResolver extends AbstractRequestResolver<IDeliverab
             final IRequest parent = manager.getRequestForToken(token);
 
             if (parent.getState() != RequestState.CANCELLED && parent.getState() != RequestState.OVERRULED)
+            {
                 manager.reassignRequest(parent.getToken(), ImmutableList.of());
+            }
         }
     }
 

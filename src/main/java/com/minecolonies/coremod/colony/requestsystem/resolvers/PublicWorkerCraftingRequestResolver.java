@@ -39,10 +39,21 @@ public class PublicWorkerCraftingRequestResolver extends AbstractCraftingRequest
         super(location, token);
     }
 
+    @Override
+    public boolean canResolve(@NotNull final IRequestManager manager, final IRequest<? extends Stack> requestToCheck)
+    {
+        if (!manager.getColony().getWorld().isRemote)
+        {
+            final Colony colony = (Colony) manager.getColony();
+            final Set<AbstractBuildingWorker> crafters = getCraftersInColony(colony, requestToCheck);
+            return !crafters.isEmpty();
+        }
+        return false;
+    }
+
     @Nullable
     @Override
-    public Optional<IRequester> getBuilding(
-      @NotNull final IRequestManager manager, @NotNull final IToken<?> token)
+    public Optional<IRequester> getBuilding(@NotNull final IRequestManager manager, @NotNull final IToken<?> token)
     {
         final IRequest request = manager.getRequestForToken(token);
         if (request == null)
@@ -77,34 +88,18 @@ public class PublicWorkerCraftingRequestResolver extends AbstractCraftingRequest
     @Override
     public IRequest<?> getFollowupRequestForCompletion(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> completedRequest)
     {
-        final IColony colony = manager.getColony();
-        if (colony instanceof Colony)
-        {
-            final IRequestResolver resolver = colony.getRequestManager().getResolverForRequest(completedRequest.getToken());
-            if(resolver instanceof PublicWorkerCraftingRequestResolver)
-            {
-                final Delivery delivery = new Delivery(resolver.getRequesterLocation(), completedRequest.getRequester().getRequesterLocation(), completedRequest.getDelivery().copy());
-
-                final IToken<?> requestToken =
-                        manager.createRequest(new PublicWorkerCraftingRequestResolver(completedRequest.getRequester().getRequesterLocation(), completedRequest.getToken()),
-                                delivery);
-                return manager.getRequestForToken(requestToken);
-            }
-        }
         return null;
     }
 
     @Nullable
     @Override
-    public IRequest<?> onRequestCancelled(
-      @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request)
+    public IRequest<?> onRequestCancelled(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request)
     {
         return null;
     }
 
     @Override
-    public void onRequestBeingOverruled(
-      @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request)
+    public void onRequestBeingOverruled(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request)
     {
         //NOOP
     }
@@ -135,6 +130,7 @@ public class PublicWorkerCraftingRequestResolver extends AbstractCraftingRequest
         final Colony colony = (Colony) manager.getColony();
         final Set<AbstractBuildingWorker> crafters = getCraftersInColony(colony, request);
 
+        //todo priority handling and check if not resolver not occupied.
         for (final AbstractBuildingWorker crafter : crafters)
         {
             return attemptResolveForBuildingAndStack(manager, crafter, request.getRequest().getStack());
