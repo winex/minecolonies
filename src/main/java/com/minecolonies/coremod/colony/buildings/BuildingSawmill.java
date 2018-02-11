@@ -2,7 +2,6 @@ package com.minecolonies.coremod.colony.buildings;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
-import com.minecolonies.api.colony.requestsystem.location.ILocation;
 import com.minecolonies.api.colony.requestsystem.resolver.IRequestResolver;
 import com.minecolonies.api.util.constant.TypeConstants;
 import com.minecolonies.blockout.views.Window;
@@ -12,61 +11,35 @@ import com.minecolonies.coremod.colony.Colony;
 import com.minecolonies.coremod.colony.ColonyView;
 import com.minecolonies.coremod.colony.jobs.AbstractJob;
 import com.minecolonies.coremod.colony.jobs.JobDeliveryman;
-import com.minecolonies.coremod.colony.requestsystem.resolvers.DeliveryRequestResolver;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NBTTagCompound;
+import com.minecolonies.coremod.colony.requestsystem.resolvers.PublicWorkerCraftingRequestResolver;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Class of the Deliveryman building.
+ * Class of the sawmill building.
  */
-public class BuildingDeliveryman extends AbstractBuildingWorker
+public class BuildingSawmill extends AbstractBuildingWorker
 {
 
-    private static final String DELIVERYMAN = "Deliveryman";
+    private static final String SAWMILL = "Sawmill";
 
     /**
-     * Building the deliveryman will deliver somethingTo
-     */
-    private ILocation buildingToDeliver;
-
-    /**
-     * Instantiates a new Deliveryman building.
+     * Instantiates a new sawmill building.
      *
      * @param c the colony.
      * @param l the location
      */
-    public BuildingDeliveryman(final Colony c, final BlockPos l)
+    public BuildingSawmill(final Colony c, final BlockPos l)
     {
         super(c, l);
     }
 
-    /**
-     * Get the building the deliveryman should deliver to.
-     *
-     * @return the building.
-     */
-    public ILocation getBuildingToDeliver()
-    {
-        return this.buildingToDeliver;
-    }
-
-    /**
-     * Set the building the deliveryman should deliver to.
-     *
-     * @param building building to deliver to.
-     */
-    public void setBuildingToDeliver(final ILocation building)
-    {
-        this.buildingToDeliver = building;
-    }
 
     @NotNull
     @Override
     public String getSchematicName()
     {
-        return DELIVERYMAN;
+        return SAWMILL;
     }
 
     @Override
@@ -82,7 +55,7 @@ public class BuildingDeliveryman extends AbstractBuildingWorker
         final ImmutableList.Builder<IRequestResolver<?>> builder = ImmutableList.builder();
 
         builder.addAll(supers);
-        builder.add(new DeliveryRequestResolver(getRequester().getRequesterLocation(),
+        builder.add(new PublicWorkerCraftingRequestResolver(getRequester().getRequesterLocation(),
                                                  getColony().getRequestManager().getFactoryController().getNewInstance(TypeConstants.ITOKEN)));
 
         return builder.build();
@@ -99,7 +72,13 @@ public class BuildingDeliveryman extends AbstractBuildingWorker
     @Override
     public String getJobName()
     {
-        return DELIVERYMAN;
+        return SAWMILL;
+    }
+
+    @Override
+    public boolean canCraftComplexRecipes()
+    {
+        return true;
     }
 
     /**
@@ -123,7 +102,7 @@ public class BuildingDeliveryman extends AbstractBuildingWorker
         @Override
         public Window getWindow()
         {
-            return new WindowHutWorkerPlaceholder<>(this, DELIVERYMAN);
+            return new WindowHutWorkerPlaceholder<>(this, SAWMILL);
         }
 
         @NotNull

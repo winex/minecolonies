@@ -142,6 +142,8 @@ public abstract class AbstractBuilding implements IRequestResolverProvider, IReq
         addMapping("SwingHerder", BuildingSwineHerder.class, BuildingSwineHerder.View.class, BlockHutSwineHerder.class);
         addMapping("ChickenHerder", BuildingChickenHerder.class, BuildingChickenHerder.View.class, BlockHutChickenHerder.class);
         addMapping("Smeltery", BuildingSmeltery.class, BuildingSmeltery.View.class, BlockHutSmeltery.class);
+        addMapping("Sawmill", BuildingSawmill.class, BuildingSawmill.View.class, BlockHutSawmill.class);
+
     }
     /**
      * List of items the worker should keep.
