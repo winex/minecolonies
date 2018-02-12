@@ -57,6 +57,7 @@ public abstract class AbstractJob
     private static final String MAPPING_SWINE_HERDER   = "SwineHerder";
     private static final String MAPPING_CHICKEN_HERDER = "ChickenHerder";
     private static final String MAPPING_SMELTER        = "Smelter";
+    private static final String MAPPING_SAWMILL        = "Sawmill";
 
     /**
      * The priority assigned with every main AI job.
@@ -86,6 +87,7 @@ public abstract class AbstractJob
         addMapping(MAPPING_SWINE_HERDER, JobSwineHerder.class);
         addMapping(MAPPING_CHICKEN_HERDER, JobChickenHerder.class);
         addMapping(MAPPING_SMELTER, JobSmelter.class);
+        addMapping(MAPPING_SAWMILL, JobSawmill.class);
     }
 
     /**
