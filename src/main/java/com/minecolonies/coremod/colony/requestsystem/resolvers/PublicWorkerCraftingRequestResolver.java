@@ -42,11 +42,11 @@ public class PublicWorkerCraftingRequestResolver extends AbstractCraftingRequest
     @Override
     public boolean canResolve(@NotNull final IRequestManager manager, final IRequest<? extends Stack> requestToCheck)
     {
+        final ILocation location = getRequesterLocation();
         if (!manager.getColony().getWorld().isRemote)
         {
             final Colony colony = (Colony) manager.getColony();
-            final Set<AbstractBuildingWorker> crafters = getCraftersInColony(colony, requestToCheck);
-            return !crafters.isEmpty();
+            canBuildingCraftStack(colony.getBuildingManager().getBuilding(location.getInDimensionLocation(), stack);
         }
         return false;
     }
