@@ -1,5 +1,6 @@
 package com.minecolonies.coremod.colony.jobs;
 
+import com.minecolonies.api.util.constant.TypeConstants;
 import com.minecolonies.coremod.client.render.RenderBipedCitizen;
 import com.minecolonies.coremod.colony.CitizenData;
 import com.minecolonies.coremod.entity.ai.basic.AbstractAISkeleton;
@@ -19,7 +20,7 @@ public class JobCowboy extends AbstractJob
      */
     public JobCowboy(final CitizenData entity)
     {
-        super(entity);
+        super(entity, TypeConstants.REQUEST_SYSTEM_JOB_DATA_STORE);
     }
 
     @NotNull

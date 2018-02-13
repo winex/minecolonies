@@ -1,5 +1,6 @@
 package com.minecolonies.coremod.colony.jobs;
 
+import com.minecolonies.api.util.constant.TypeConstants;
 import com.minecolonies.coremod.achievements.ModAchievements;
 import com.minecolonies.coremod.client.render.RenderBipedCitizen;
 import com.minecolonies.coremod.colony.CitizenData;
@@ -31,7 +32,7 @@ public class JobLumberjack extends AbstractJob
      */
     public JobLumberjack(final CitizenData entity)
     {
-        super(entity);
+        super(entity, TypeConstants.REQUEST_SYSTEM_JOB_DATA_STORE);
     }
 
     /**

@@ -150,7 +150,7 @@ public class StandardPlayerRequestResolver implements IPlayerRequestResolver
 
     @Nullable
     @Override
-    public IRequest getFollowupRequestForCompletion(@NotNull final IRequestManager manager, @NotNull final IRequest completedRequest)
+    public IToken<?> getFollowupRequestForCompletion(@NotNull final IRequestManager manager, @NotNull final IRequest completedRequest)
     {
         //This is not what this method is for, but this is the closest we are getting right now, so why not.
         if (assignedRequests.contains(completedRequest.getToken()))
@@ -163,7 +163,7 @@ public class StandardPlayerRequestResolver implements IPlayerRequestResolver
 
     @Nullable
     @Override
-    public IRequest<?> onRequestCancelled(
+    public IToken<?> onRequestCancelled(
       @NotNull final IRequestManager manager, @NotNull final IRequest<? extends IRequestable> request)
     {
         return getFollowupRequestForCompletion(manager, request);
@@ -199,16 +199,14 @@ public class StandardPlayerRequestResolver implements IPlayerRequestResolver
     @Override
     public void onRequestComplete(@NotNull final IRequestManager manager,@NotNull final IToken token)
     {
-        /**
-         * Nothing to do here right now.
-         */
+        manager.updateRequestState(token, RequestState.RECEIVED);
     }
 
     @NotNull
     @Override
     public void onRequestCancelled(@NotNull final IRequestManager manager,@NotNull final IToken token)
     {
-
+        //Noop
     }
 
     @NotNull

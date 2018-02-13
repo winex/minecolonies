@@ -411,7 +411,7 @@ public class StandardRequestManagerTest
         @SuppressWarnings(RAWTYPES)
         @Nullable
         @Override
-        public IRequest getFollowupRequestForCompletion(
+        public IToken<?> getFollowupRequestForCompletion(
                                                          @NotNull final IRequestManager manager, @NotNull final IRequest<? extends StringRequestable> completedRequest)
         {
             return null;
@@ -419,7 +419,7 @@ public class StandardRequestManagerTest
 
         @Nullable
         @Override
-        public IRequest<?> onRequestCancelled(
+        public IToken<?> onRequestCancelled(
           @NotNull final IRequestManager manager, @NotNull final IRequest<? extends StringRequestable> request)
         {
             return null;

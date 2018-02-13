@@ -5,6 +5,7 @@ import com.google.common.reflect.TypeToken;
 import com.minecolonies.api.colony.requestsystem.location.ILocation;
 import com.minecolonies.api.colony.requestsystem.manager.IRequestManager;
 import com.minecolonies.api.colony.requestsystem.request.IRequest;
+import com.minecolonies.api.colony.requestsystem.request.RequestState;
 import com.minecolonies.api.colony.requestsystem.requestable.Delivery;
 import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.api.util.BlockPosUtil;
@@ -106,12 +107,12 @@ public class DeliveryRequestResolver extends AbstractRequestResolver<Delivery>
     public void resolve(
       @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Delivery> request) throws RuntimeException
     {
-        //Noop. The delivery man will resolve it.
+        //Noop.
     }
 
     @Nullable
     @Override
-    public IRequest<?> getFollowupRequestForCompletion(
+    public IToken<?> getFollowupRequestForCompletion(
       @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Delivery> completedRequest)
     {
         return null;
@@ -119,7 +120,7 @@ public class DeliveryRequestResolver extends AbstractRequestResolver<Delivery>
 
     @Nullable
     @Override
-    public IRequest<?> onRequestCancelled(
+    public IToken<?> onRequestCancelled(
       @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Delivery> request)
     {
         if (!manager.getColony().getWorld().isRemote)
@@ -149,18 +150,18 @@ public class DeliveryRequestResolver extends AbstractRequestResolver<Delivery>
     public void onRequestBeingOverruled(
       @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Delivery> request)
     {
-        onRequestCancelled(manager, request);
+        //Noop
     }
 
     @Override
     public void onRequestComplete(@NotNull final IRequestManager manager, @NotNull final IToken<?> token)
     {
-        //We are not scheduling any child requests. So this should never be called.
+        manager.updateRequestState(token, RequestState.RECEIVED);
     }
 
     @Override
     public void onRequestCancelled(@NotNull final IRequestManager manager, @NotNull final IToken<?> token)
     {
-        Log.getLogger().error("cancelled");
+        //Noop
     }
 }

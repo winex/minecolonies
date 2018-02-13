@@ -2,8 +2,12 @@ package com.minecolonies.api.util.constant;
 
 import com.google.common.reflect.TypeToken;
 import com.minecolonies.api.colony.requestsystem.data.*;
+import com.minecolonies.api.colony.requestsystem.data.job.IRequestSystemCraftingJobDataStore;
+import com.minecolonies.api.colony.requestsystem.data.job.IRequestSystemDeliveryManJobDataStore;
+import com.minecolonies.api.colony.requestsystem.data.job.IRequestSystemJobDataStore;
 import com.minecolonies.api.colony.requestsystem.factory.FactoryVoidInput;
 import com.minecolonies.api.colony.requestsystem.location.ILocation;
+import com.minecolonies.api.colony.requestsystem.request.IRequest;
 import com.minecolonies.api.colony.requestsystem.requestable.IDeliverable;
 import com.minecolonies.api.colony.requestsystem.requestable.IRequestable;
 import com.minecolonies.api.colony.requestsystem.requestable.IRetryable;
@@ -45,10 +49,12 @@ public class TypeConstants
     public static final TypeToken<IRequestResolverRequestAssignmentDataStore>         REQUEST_RESOLVER_REQUEST_ASSIGNMENT_DATA_STORE
                                                                                                                                       = TypeToken.of(IRequestResolverRequestAssignmentDataStore.class);
     public static final TypeToken<IRequestableTypeRequestResolverAssignmentDataStore> REQUESTABLE_TYPE_REQUEST_RESOLVER_ASSIGNMENT_DATA_STORE
-                                                                                                                                      = TypeToken.of(IRequestableTypeRequestResolverAssignmentDataStore.class);
-    public static final TypeToken<IDataStoreManager>                                  DATA_STORE_MANAGER                              = TypeToken.of(IDataStoreManager.class);
-    public static final TypeToken<IRequestSystemBuildingDataStore> REQUEST_SYSTEM_BUILDING_DATA_STORE = TypeToken.of(IRequestSystemBuildingDataStore.class);
-    public static final TypeToken<IRequestSystemDeliveryManJobDataStore> REQUEST_SYSTEM_DELIVERY_MAN_JOB_DATA_STORE = TypeToken.of(IRequestSystemDeliveryManJobDataStore.class);
+                                                                                                                                 = TypeToken.of(IRequestableTypeRequestResolverAssignmentDataStore.class);
+    public static final TypeToken<IDataStoreManager>                                  DATA_STORE_MANAGER                         = TypeToken.of(IDataStoreManager.class);
+    public static final TypeToken<IRequestSystemBuildingDataStore>                    REQUEST_SYSTEM_BUILDING_DATA_STORE         = TypeToken.of(IRequestSystemBuildingDataStore.class);
+    public static final TypeToken<IRequestSystemDeliveryManJobDataStore>              REQUEST_SYSTEM_DELIVERY_MAN_JOB_DATA_STORE = TypeToken.of(IRequestSystemDeliveryManJobDataStore.class);
+    public static final TypeToken<IRequestSystemJobDataStore>                         REQUEST_SYSTEM_JOB_DATA_STORE = TypeToken.of(IRequestSystemJobDataStore.class);
+    public static final TypeToken<IRequestSystemCraftingJobDataStore>                 REQUEST_SYSTEM_CRAFTING_JOB_DATA_STORE = TypeToken.of(IRequestSystemCraftingJobDataStore.class);
 
 
     /////Implementations

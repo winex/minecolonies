@@ -28,7 +28,7 @@ public class PrivateWorkerCraftingRequestResolver extends AbstractCraftingReques
 {
     public PrivateWorkerCraftingRequestResolver(@NotNull final ILocation location, @NotNull final IToken<?> token)
     {
-        super(location, token, false);
+        super(location, token, false, false);
     }
 
     @Nullable
@@ -67,7 +67,7 @@ public class PrivateWorkerCraftingRequestResolver extends AbstractCraftingReques
 
     @Nullable
     @Override
-    public IRequest<?> getFollowupRequestForCompletion(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> completedRequest)
+    public IToken<?> getFollowupRequestForCompletion(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> completedRequest)
     {
         //No followup needed.
         return null;
@@ -75,7 +75,7 @@ public class PrivateWorkerCraftingRequestResolver extends AbstractCraftingReques
 
     @Nullable
     @Override
-    public IRequest<?> onRequestCancelled(
+    public IToken<?> onRequestCancelled(
       @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request)
     {
         return null;

@@ -37,6 +37,11 @@ public enum RequestState
     IN_PROGRESS,
 
     /**
+     * State for a request that has been completed by the resolver but follow up still needs to be processed.
+     */
+    POST_PROCESSING,
+
+    /**
      * State for a request that has been completed.
      */
     COMPLETED,

@@ -26,14 +26,16 @@ import java.util.stream.Collectors;
 public abstract class AbstractCraftingRequestResolver extends AbstractRequestResolver<Stack> implements IBuildingBasedRequester
 {
 
-    public final boolean isPublicCrafter;
+    private final boolean isPublicCrafter;
+    private final boolean preCheckOnAttempt;
 
     public AbstractCraftingRequestResolver(
       @NotNull final ILocation location,
-      @NotNull final IToken<?> token, final boolean isPublicCrafter)
+      @NotNull final IToken<?> token, final boolean isPublicCrafter, final boolean preCheckOnAttempt)
     {
         super(location, token);
         this.isPublicCrafter = isPublicCrafter;
+        this.preCheckOnAttempt = preCheckOnAttempt;
     }
 
     @Override
@@ -79,7 +81,12 @@ public abstract class AbstractCraftingRequestResolver extends AbstractRequestRes
             return false;
         }
 
-        return building instanceof AbstractBuildingWorker && canBuildingCraftStack((AbstractBuildingWorker) building, request.getRequest().getStack());
+        return building instanceof AbstractBuildingWorker && canBuildingCraftStack((AbstractBuildingWorker) building, request.getRequest().getStack()) && canRequestBeAssignedToWorker(manager, request);
+    }
+
+    protected boolean canRequestBeAssignedToWorker(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request)
+    {
+        return true;
     }
 
     protected boolean createsCraftingCycle(@NotNull final IRequestManager manager, @NotNull final IRequest<?> request, @NotNull final IRequest<? extends Stack> target)
@@ -97,7 +104,7 @@ public abstract class AbstractCraftingRequestResolver extends AbstractRequestRes
         return createsCraftingCycle(manager, manager.getRequestForToken(request.getParent()), target);
     }
 
-    public abstract boolean canBuildingCraftStack(@NotNull final AbstractBuildingWorker building, ItemStack stack);
+    protected abstract boolean canBuildingCraftStack(@NotNull final AbstractBuildingWorker building, ItemStack stack);
 
     @Nullable
     @Override
@@ -105,7 +112,20 @@ public abstract class AbstractCraftingRequestResolver extends AbstractRequestRes
       @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request)
     {
         final AbstractBuilding building = getBuilding(manager, request.getToken()).map(r -> (AbstractBuilding) r).get();
-        return attemptResolveForBuilding(manager, request, building);
+        final List<IToken<?>> requests = attemptResolveForBuilding(manager, request, building);
+
+        if (requests != null)
+        {
+            return assignRequestToWorker(manager, request, requests);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    protected List<IToken<?>> assignRequestToWorker(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request, @NotNull final List<IToken<?>> currentChildRequests)
+    {
+        return currentChildRequests;
     }
 
     @Nullable
@@ -120,7 +140,7 @@ public abstract class AbstractCraftingRequestResolver extends AbstractRequestRes
     protected List<IToken<?>> attemptResolveForBuildingAndStack(@NotNull final IRequestManager manager, @NotNull final AbstractBuildingWorker building, final ItemStack stack)
     {
         final IRecipeStorage fullfillableCrafting = building.getFirstFullFillableRecipe(stack);
-        if (fullfillableCrafting != null)
+        if (preCheckOnAttempt && fullfillableCrafting != null)
         {
             return ImmutableList.of();
         }
@@ -142,6 +162,11 @@ public abstract class AbstractCraftingRequestResolver extends AbstractRequestRes
         //Now check if we excede an ingredients max stack size.
         for(final ItemStack ingredient : storage.getInput())
         {
+            if (ItemStackUtils.isEmpty(ingredient))
+            {
+                continue;
+            }
+
             //Calculate the input count for the ingredient.
             final int ingredientInputCount = ItemStackUtils.getSize(ingredient) * craftingCount;
             //Check if we are above the max stacksize.
@@ -201,9 +226,19 @@ public abstract class AbstractCraftingRequestResolver extends AbstractRequestRes
         final int craftingCount = calculateMaxCraftingCount(request.getRequest().getStack(), storage);
         for (int i = 0; i < craftingCount; i++)
         {
-            buildingWorker.fullFillRecipe(storage);
+            performCraftingForBuilding(buildingWorker, storage);
         }
 
-        manager.updateRequestState(request.getToken(), RequestState.COMPLETED);
+        onCraftingCompleted(manager, request);
+    }
+
+    protected void performCraftingForBuilding(@NotNull final AbstractBuildingWorker worker, @NotNull final IRecipeStorage recipeStorage)
+    {
+        worker.fullFillRecipe(recipeStorage);
+    }
+
+    protected void onCraftingCompleted(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request)
+    {
+        manager.updateRequestState(request.getToken(), RequestState.POST_PROCESSING);
     }
 }

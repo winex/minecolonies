@@ -119,12 +119,12 @@ public class WarehouseRequestResolver extends AbstractRequestResolver<IDeliverab
     @Override
     public void resolve(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends IDeliverable> request)
     {
-        manager.updateRequestState(request.getToken(), RequestState.COMPLETED);
+        manager.updateRequestState(request.getToken(), RequestState.POST_PROCESSING);
     }
 
     @Nullable
     @Override
-    public IRequest<?> getFollowupRequestForCompletion(
+    public IToken<?> getFollowupRequestForCompletion(
                                                      @NotNull final IRequestManager manager, @NotNull final IRequest<? extends IDeliverable> completedRequest)
     {
         //No followup needed.
@@ -133,7 +133,7 @@ public class WarehouseRequestResolver extends AbstractRequestResolver<IDeliverab
 
     @Nullable
     @Override
-    public IRequest<?> onRequestCancelled(
+    public IToken<?> onRequestCancelled(
       @NotNull final IRequestManager manager, @NotNull final IRequest<? extends IDeliverable> request)
     {
         return null;
@@ -156,7 +156,7 @@ public class WarehouseRequestResolver extends AbstractRequestResolver<IDeliverab
     @Override
     public void onRequestComplete(@NotNull final IRequestManager manager, @NotNull final IToken<?> token)
     {
-        //NOOP.
+        manager.updateRequestState(token, RequestState.RECEIVED);
     }
 
     @Override

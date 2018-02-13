@@ -8,6 +8,9 @@ import com.minecolonies.api.colony.requestsystem.token.RandomSeededTokenFactory;
 import com.minecolonies.api.colony.requestsystem.token.StandardTokenFactory;
 import com.minecolonies.api.crafting.RecipeStorageFactory;
 import com.minecolonies.coremod.colony.requestsystem.data.*;
+import com.minecolonies.coremod.colony.requestsystem.data.job.StandardRequestSystemCrafterJobDataStore;
+import com.minecolonies.coremod.colony.requestsystem.data.job.StandardRequestSystemDeliveryManJobDataStore;
+import com.minecolonies.coremod.colony.requestsystem.data.job.StandardRequestSystemJobDataStore;
 import com.minecolonies.coremod.colony.requestsystem.locations.EntityLocation;
 import com.minecolonies.coremod.colony.requestsystem.locations.StaticLocation;
 import com.minecolonies.coremod.colony.requestsystem.requesters.factories.BuildingBasedRequesterFactory;
@@ -58,6 +61,8 @@ public final class StandardFactoryControllerInitializer
         StandardFactoryController.getInstance().registerNewFactory(new StandardRequestableTypeRequestResolverAssignmentDataStore.Factory());
         StandardFactoryController.getInstance().registerNewFactory(new StandardRequestSystemBuildingDataStore.Factory());
         StandardFactoryController.getInstance().registerNewFactory(new StandardRequestSystemDeliveryManJobDataStore.Factory());
+        StandardFactoryController.getInstance().registerNewFactory(new StandardRequestSystemJobDataStore.Factory());
+        StandardFactoryController.getInstance().registerNewFactory(new StandardRequestSystemCrafterJobDataStore.Factory());
         StandardFactoryController.getInstance().registerNewFactory(new StandardDataStoreManager.Factory());
 
         StandardFactoryController.getInstance().registerNewTypeOverrideHandler(new TypeTokenFactory.TypeTokenSubTypeOverrideHandler());

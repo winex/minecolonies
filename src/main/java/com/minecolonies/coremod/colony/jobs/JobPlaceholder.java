@@ -1,5 +1,6 @@
 package com.minecolonies.coremod.colony.jobs;
 
+import com.minecolonies.api.util.constant.TypeConstants;
 import com.minecolonies.coremod.colony.CitizenData;
 import com.minecolonies.coremod.entity.ai.basic.AbstractAISkeleton;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +19,7 @@ public class JobPlaceholder extends AbstractJob
      */
     public JobPlaceholder(final CitizenData entity)
     {
-        super(entity);
+        super(entity, TypeConstants.REQUEST_SYSTEM_JOB_DATA_STORE);
     }
 
     @NotNull

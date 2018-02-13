@@ -1,9 +1,13 @@
 package com.minecolonies.coremod.colony.jobs;
 
+import com.google.common.reflect.TypeToken;
 import com.minecolonies.api.colony.requestsystem.StandardFactoryController;
+import com.minecolonies.api.colony.requestsystem.data.job.IRequestSystemJobDataStore;
 import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.NBTUtils;
+import com.minecolonies.api.util.constant.NbtTagConstants;
+import com.minecolonies.api.util.constant.TypeConstants;
 import com.minecolonies.coremod.client.render.RenderBipedCitizen;
 import com.minecolonies.coremod.colony.CitizenData;
 import com.minecolonies.coremod.colony.Colony;
@@ -21,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,10 +40,10 @@ import static com.minecolonies.api.util.constant.Suppression.CLASSES_SHOULD_NOT_
  * We are only mapping classes and that is reasonable
  */
 @SuppressWarnings(CLASSES_SHOULD_NOT_ACCESS_STATIC_MEMBERS_OF_THEIR_OWN_SUBCLASSES_DURING_INITIALIZATION)
-public abstract class AbstractJob
+public abstract class AbstractJob<D extends IRequestSystemJobDataStore>
 {
-    private static final String TAG_TYPE           = "type";
-    private static final String TAG_ASYNC_REQUESTS = "asyncRequests";
+    private static final String TAG_TYPE         = "type";
+    private static final String TAG_DATASTORE_ID = "dataStore";
 
     private static final String MAPPING_PLACEHOLDER    = "Placeholder";
     private static final String MAPPING_BUILDER        = "Builder";
@@ -101,9 +104,14 @@ public abstract class AbstractJob
     private String nameTag = "";
 
     /**
-     * A set of tokens that point to requests for which we do not wait.
+     * Final field holding the type of the datastore.
      */
-    private final Set<IToken> asyncRequests = new HashSet<>();
+    private final TypeToken<D> dataStoreType;
+
+    /**
+     *
+     */
+    private IToken<?> rsDataStoreToken;
 
     /**
      * Check if the worker has searched for food today.
@@ -115,9 +123,25 @@ public abstract class AbstractJob
      *
      * @param entity the citizen data.
      */
-    public AbstractJob(final CitizenData entity)
+    public AbstractJob(final CitizenData entity, final TypeToken<D> dataStoreType)
     {
         citizen = entity;
+        this.dataStoreType = dataStoreType;
+
+        setupRsDataStore();
+    }
+
+    private void setupRsDataStore()
+    {
+        rsDataStoreToken = this.getCitizen()
+                             .getColony()
+                             .getRequestManager()
+                             .getDataStoreManager()
+                             .get(
+                               StandardFactoryController.getInstance().getNewInstance(TypeConstants.ITOKEN),
+                               dataStoreType
+                             )
+                             .getId();
     }
 
     /**
@@ -202,13 +226,13 @@ public abstract class AbstractJob
      */
     public void readFromNBT(@NotNull final NBTTagCompound compound)
     {
-        this.asyncRequests.clear();
-        if (compound.hasKey(TAG_ASYNC_REQUESTS))
+        if(compound.hasKey(TAG_DATASTORE_ID))
         {
-            this.asyncRequests.addAll(NBTUtils.streamCompound(compound.getTagList(TAG_ASYNC_REQUESTS, Constants.NBT.TAG_COMPOUND))
-                                        .map(StandardFactoryController.getInstance()::deserialize)
-                                        .map(o -> (IToken) o)
-                                        .collect(Collectors.toSet()));
+            rsDataStoreToken = StandardFactoryController.getInstance().deserialize(compound.getCompoundTag(TAG_DATASTORE_ID));
+        }
+        else
+        {
+            setupRsDataStore();
         }
     }
 
@@ -254,12 +278,17 @@ public abstract class AbstractJob
         }
 
         compound.setString(TAG_TYPE, s);
-        compound.setTag(TAG_ASYNC_REQUESTS, getAsyncRequests().stream().map(StandardFactoryController.getInstance()::serialize).collect(NBTUtils.toNBTTagList()));
+        compound.setTag(TAG_DATASTORE_ID, StandardFactoryController.getInstance().serialize(rsDataStoreToken));
     }
 
-    public Set<IToken> getAsyncRequests()
+    public D getDataStore()
     {
-        return asyncRequests;
+        return getCitizen().getColony().getRequestManager().getDataStoreManager().get(rsDataStoreToken, dataStoreType);
+    }
+
+    public Set<IToken<?>> getAsyncRequests()
+    {
+        return getDataStore().getAsyncRequestTokens();
     }
 
     /**

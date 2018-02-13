@@ -198,6 +198,13 @@ public final class NbtTagConstants
 
     public static final String TAG_CITIZEN_BY_OPEN_REQUEST = "CitizenByOpenRequest";
 
+    public static final String TAG_RS_JOB_ASYNC = "AsyncRequestToken";
+
+    public static final String TAG_RS_JOB_DMAN_TASKS = "DManTasks";
+
+    public static final String TAG_RS_JOB_DMAN_RETURNING = "Returning";
+
+    public static final String TAG_RS_JOB_CRAFTER_TASKS = "CrafterTasks";
 
     /**
      * Private constructor to hide the implicit one.

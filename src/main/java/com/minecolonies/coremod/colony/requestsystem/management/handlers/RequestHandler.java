@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.minecolonies.api.util.constant.Suppression.MAGIC_NUMBERS_SHOULD_NOT_BE_USED;
 import static com.minecolonies.api.util.constant.Suppression.RAWTYPES;
 import static com.minecolonies.api.util.constant.Suppression.UNCHECKED;
 
@@ -274,37 +275,57 @@ public final class RequestHandler
         @SuppressWarnings(RAWTYPES) final IRequest request = getRequest(manager, token);
         @SuppressWarnings(RAWTYPES) final IRequestResolver resolver = ResolverHandler.getResolverForRequest(manager, token);
 
+        //Retrieve a followup request.
+        @SuppressWarnings(RAWTYPES) final IToken followupRequestToken = resolver.getFollowupRequestForCompletion(manager, request);
+
+        if (followupRequestToken != null)
+        {
+            @SuppressWarnings(RAWTYPES) final IRequest followupRequest = getRequest(manager, followupRequestToken);
+
+            followupRequest.setParent(token);
+            request.addChild(followupRequestToken);
+
+            if (!isAssigned(manager, followupRequestToken))
+            {
+                assignRequest(manager, followupRequest);
+            }
+        }
+        else
+        {
+            manager.updateRequestState(token, RequestState.COMPLETED);
+        }
+    }
+
+    /**
+     * Method used to handle the successful resolving of a request.
+     *
+     * @param manager The manager that got notified of the successful resolving of the request.
+     * @param token   The token of the request that got finished successfully.
+     */
+    @SuppressWarnings(UNCHECKED)
+    public static void onRequestCompleted(final IStandardRequestManager manager, final IToken<?> token)
+    {
+        @SuppressWarnings(RAWTYPES) final IRequest request = getRequest(manager, token);
+
         request.getRequester().onRequestComplete(manager, token);
 
-        //Retrieve a followup request.
-        @SuppressWarnings(RAWTYPES) final IRequest followupRequest = resolver.getFollowupRequestForCompletion(manager, request);
-
-        //Check if the request has a parent
         if (request.hasParent())
         {
             @SuppressWarnings(RAWTYPES) final IRequest parentRequest = getRequest(manager, request.getParent());
-
-            //Assign the followup to the parent as a child so that processing is still halted.
-            if (followupRequest != null)
+            if (parentRequest.getState() == RequestState.IN_PROGRESS)
             {
-                parentRequest.addChild(followupRequest.getToken());
+                request.setParent(null);
+                parentRequest.removeChild(request.getToken());
+
+                if (parentRequest.getChildren().isEmpty())
+                {
+                    resolveRequest(manager, parentRequest);
+                }
             }
-
-            manager.updateRequestState(request.getToken(), RequestState.RECEIVED);
-            parentRequest.removeChild(request.getToken());
-
-            if (!parentRequest.hasChildren() && parentRequest.getState() == RequestState.IN_PROGRESS)
+            else if (parentRequest.getState() == RequestState.POST_PROCESSING)
             {
-                resolveRequest(manager, parentRequest);
+                manager.updateRequestState(parentRequest.getToken(), RequestState.COMPLETED);
             }
-
-            request.setParent(null);
-        }
-
-        //Assign the followup request if need be
-        if (followupRequest != null && !isAssigned(manager, followupRequest.getToken()))
-        {
-            assignRequest(manager, followupRequest);
         }
     }
 
@@ -393,7 +414,10 @@ public final class RequestHandler
 
         //Now lets get ourselfs a clean up.
         final IRequestResolver<?> targetResolver = ResolverHandler.getResolverForRequest(manager, request);
-        processParentReplacement(manager, request, targetResolver.onRequestCancelled(manager, request));
+        final IToken<?> replacementRequestToken = targetResolver.onRequestCancelled(manager, request);
+        final IRequest<?> replacementRequest = getRequest(manager, replacementRequestToken);
+
+        processParentReplacement(manager, request, replacementRequest);
 
         manager.updateRequestState(token, RequestState.FINALIZING);
     }

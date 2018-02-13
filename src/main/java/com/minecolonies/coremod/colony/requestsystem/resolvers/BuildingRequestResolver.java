@@ -95,7 +95,7 @@ public class BuildingRequestResolver extends AbstractBuildingDependentRequestRes
 
     @Nullable
     @Override
-    public IRequest<?> getFollowupRequestForCompletion(
+    public IToken<?> getFollowupRequestForCompletion(
                                                      @NotNull final IRequestManager manager, @NotNull final IRequest<? extends IDeliverable> completedRequest)
     {
         return null;
@@ -103,7 +103,7 @@ public class BuildingRequestResolver extends AbstractBuildingDependentRequestRes
 
     @Nullable
     @Override
-    public IRequest<?> onRequestCancelled(
+    public IToken<?> onRequestCancelled(
       @NotNull final IRequestManager manager, @NotNull final IRequest<? extends IDeliverable> request)
     {
         return null;
@@ -121,7 +121,7 @@ public class BuildingRequestResolver extends AbstractBuildingDependentRequestRes
     @Override
     public void onRequestComplete(@NotNull final IRequestManager manager, @NotNull final IToken<?> token)
     {
-
+        manager.updateRequestState(token, RequestState.RECEIVED);
     }
 
     @Override

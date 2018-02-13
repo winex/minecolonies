@@ -257,9 +257,13 @@ public class StandardRequestManager implements IStandardRequestManager
 
         switch (request.getState())
         {
-            case COMPLETED:
-                LogHandler.log("Request completed: " + token + ". Notifying parent and requester...");
+            case POST_PROCESSING:
+                LogHandler.log("Request entered post processing: " + token + ". Notifying resolver...");
                 RequestHandler.onRequestSuccessful(this, token);
+                return;
+            case COMPLETED:
+                LogHandler.log("Request completed: " + token + ". Notifying requester...");
+                RequestHandler.onRequestCompleted(this, token);
                 return;
             case OVERRULED:
                 LogHandler.log("Request overruled: " + token + ". Notifying parent, children and requester...");

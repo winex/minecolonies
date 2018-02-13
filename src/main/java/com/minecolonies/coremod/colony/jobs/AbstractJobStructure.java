@@ -1,12 +1,14 @@
 package com.minecolonies.coremod.colony.jobs;
 
+import com.google.common.reflect.TypeToken;
+import com.minecolonies.api.colony.requestsystem.data.job.IRequestSystemJobDataStore;
 import com.minecolonies.coremod.colony.CitizenData;
 import com.minecolonies.coremod.util.StructureWrapper;
 
 /**
  * Common job object for all structure AIs.
  */
-public abstract class AbstractJobStructure extends AbstractJob
+public abstract class AbstractJobStructure<D extends IRequestSystemJobDataStore> extends AbstractJob<D>
 {
     /**
      * The structure the job should build.
@@ -18,9 +20,9 @@ public abstract class AbstractJobStructure extends AbstractJob
      *
      * @param entity the citizen data.
      */
-    public AbstractJobStructure(final CitizenData entity)
+    public AbstractJobStructure(final CitizenData entity, final TypeToken<D> rsDataStoreType)
     {
-        super(entity);
+        super(entity, rsDataStoreType);
     }
 
     /**

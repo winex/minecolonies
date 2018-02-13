@@ -115,7 +115,7 @@ public class StandardRetryingRequestResolver implements IRetryingRequestResolver
     @SuppressWarnings(RAWTYPES)
     @Nullable
     @Override
-    public IRequest getFollowupRequestForCompletion(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends IRetryable> completedRequest)
+    public IToken<?> getFollowupRequestForCompletion(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends IRetryable> completedRequest)
     {
         //Gets never called, since these will never get completed, only overruled or reassigned.
         return null;
@@ -123,7 +123,7 @@ public class StandardRetryingRequestResolver implements IRetryingRequestResolver
 
     @Nullable
     @Override
-    public IRequest<?> onRequestCancelled(
+    public IToken<?> onRequestCancelled(
       @NotNull final IRequestManager manager, @NotNull final IRequest<? extends IRetryable> request)
     {
         if (assignedRequests.containsKey(request.getToken()))

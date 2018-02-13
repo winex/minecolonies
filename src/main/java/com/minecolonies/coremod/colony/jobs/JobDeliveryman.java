@@ -1,14 +1,12 @@
 package com.minecolonies.coremod.colony.jobs;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.reflect.TypeToken;
 import com.minecolonies.api.colony.requestsystem.StandardFactoryController;
-import com.minecolonies.api.colony.requestsystem.data.IRequestSystemDeliveryManJobDataStore;
+import com.minecolonies.api.colony.requestsystem.data.job.IRequestSystemDeliveryManJobDataStore;
 import com.minecolonies.api.colony.requestsystem.request.IRequest;
 import com.minecolonies.api.colony.requestsystem.request.RequestState;
 import com.minecolonies.api.colony.requestsystem.requestable.Delivery;
 import com.minecolonies.api.colony.requestsystem.token.IToken;
-import com.minecolonies.api.util.NBTUtils;
 import com.minecolonies.api.util.constant.NbtTagConstants;
 import com.minecolonies.api.util.constant.TypeConstants;
 import com.minecolonies.coremod.client.render.RenderBipedCitizen;
@@ -17,9 +15,7 @@ import com.minecolonies.coremod.entity.ai.basic.AbstractAISkeleton;
 import com.minecolonies.coremod.entity.ai.citizen.deliveryman.EntityAIWorkDeliveryman;
 import com.minecolonies.coremod.sounds.DeliverymanSounds;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.SoundEvent;
-import net.minecraftforge.common.util.Constants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,10 +27,8 @@ import static com.minecolonies.api.util.constant.Suppression.UNCHECKED;
 /**
  * Class of the deliveryman job.
  */
-public class JobDeliveryman extends AbstractJob
+public class JobDeliveryman extends AbstractJob<IRequestSystemDeliveryManJobDataStore>
 {
-    private IToken<?> rsDataStoreToken;
-
     /**
      * Instantiates the job for the deliveryman.
      *
@@ -42,36 +36,7 @@ public class JobDeliveryman extends AbstractJob
      */
     public JobDeliveryman(final CitizenData entity)
     {
-        super(entity);
-        setupRsDataStore();
-    }
-
-    private void setupRsDataStore()
-    {
-        rsDataStoreToken = this.getCitizen()
-                             .getColony()
-                             .getRequestManager()
-                             .getDataStoreManager()
-                             .get(
-                               StandardFactoryController.getInstance().getNewInstance(TypeConstants.ITOKEN),
-                               TypeConstants.REQUEST_SYSTEM_DELIVERY_MAN_JOB_DATA_STORE
-                             )
-                             .getId();
-    }
-
-    @Override
-    public void readFromNBT(@NotNull final NBTTagCompound compound)
-    {
-        super.readFromNBT(compound);
-
-        if(compound.hasKey(NbtTagConstants.TAG_RS_DMANJOB_DATASTORE))
-        {
-            rsDataStoreToken = StandardFactoryController.getInstance().deserialize(compound.getCompoundTag(NbtTagConstants.TAG_RS_DMANJOB_DATASTORE));
-        }
-        else
-        {
-            setupRsDataStore();
-        }
+        super(entity, TypeConstants.REQUEST_SYSTEM_DELIVERY_MAN_JOB_DATA_STORE);
     }
 
     @NotNull
@@ -86,13 +51,6 @@ public class JobDeliveryman extends AbstractJob
     public RenderBipedCitizen.Model getModel()
     {
         return RenderBipedCitizen.Model.DELIVERYMAN;
-    }
-
-    @Override
-    public void writeToNBT(@NotNull final NBTTagCompound compound)
-    {
-        super.writeToNBT(compound);
-        compound.setTag(NbtTagConstants.TAG_RS_DMANJOB_DATASTORE, StandardFactoryController.getInstance().serialize(rsDataStoreToken));
     }
 
     /**
@@ -137,11 +95,6 @@ public class JobDeliveryman extends AbstractJob
             return getCitizen().isFemale() ? DeliverymanSounds.Female.hostile : null;
         }
         return null;
-    }
-
-    private IRequestSystemDeliveryManJobDataStore getDataStore()
-    {
-        return getCitizen().getColony().getRequestManager().getDataStoreManager().get(rsDataStoreToken, TypeConstants.REQUEST_SYSTEM_DELIVERY_MAN_JOB_DATA_STORE);
     }
 
     private LinkedList<IToken<?>> getTaskQueueFromDataStore()
@@ -200,7 +153,7 @@ public class JobDeliveryman extends AbstractJob
         this.setReturning(true);
         final IToken<?> current = getTaskQueueFromDataStore().removeFirst();
 
-        getColony().getRequestManager().updateRequestState(current, successful ? RequestState.COMPLETED : RequestState.CANCELLED);
+        getColony().getRequestManager().updateRequestState(current, successful ? RequestState.POST_PROCESSING : RequestState.CANCELLED);
     }
 
     /**
