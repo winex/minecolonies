@@ -205,7 +205,7 @@ public abstract class AbstractEntityAIUsesFurnace<J extends AbstractJob> extends
     {
         worker.setLatestStatus(new TextComponentTranslation(COM_MINECOLONIES_COREMOD_STATUS_IDLING));
         setDelay(WAIT_AFTER_REQUEST);
-        walkToBuilding();
+        ifNotAtBuildingWalkTo();
         return START_WORKING;
     }
 
@@ -243,7 +243,7 @@ public abstract class AbstractEntityAIUsesFurnace<J extends AbstractJob> extends
     {
         worker.setLatestStatus(new TextComponentTranslation(COM_MINECOLONIES_COREMOD_STATUS_GATHERING));
 
-        if (walkTo == null && walkToBuilding())
+        if (walkTo == null && ifNotAtBuildingWalkTo())
         {
             return getState();
         }

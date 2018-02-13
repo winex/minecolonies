@@ -4,6 +4,7 @@ import com.minecolonies.api.colony.requestsystem.StandardFactoryController;
 import com.minecolonies.api.colony.requestsystem.data.job.IRequestSystemCraftingJobDataStore;
 import com.minecolonies.api.colony.requestsystem.request.RequestState;
 import com.minecolonies.api.colony.requestsystem.token.IToken;
+import com.minecolonies.api.crafting.IRecipeStorage;
 import com.minecolonies.api.util.constant.NbtTagConstants;
 import com.minecolonies.api.util.constant.TypeConstants;
 import com.minecolonies.coremod.client.render.RenderBipedCitizen;
@@ -16,8 +17,9 @@ import net.minecraft.util.SoundEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map;
 
 /**
  * Class of the deliveryman job.
@@ -25,6 +27,9 @@ import java.util.List;
 public class JobSawmill extends AbstractJob<IRequestSystemCraftingJobDataStore>
 {
     private IToken<?> rsDataStoreToken;
+
+    private IToken<?> currentRequestToken;
+    private IRecipeStorage currentRecipeStorage;
 
     /**
      * Instantiates the job for the deliveryman.
@@ -130,37 +135,64 @@ public class JobSawmill extends AbstractJob<IRequestSystemCraftingJobDataStore>
         return null;
     }
 
-    public List<IToken<?>> getOpenTasks()
+    public Map<IToken<?>, List<IRecipeStorage>> getOpenTasks()
     {
         return getDataStore().getOpenRequests();
     }
 
-    public void addTask(@NotNull final IToken<?> token)
+    public void addTask(@NotNull final IToken<?> token, @NotNull final IRecipeStorage recipeStorage)
     {
-        getOpenTasks().add(token);
+        getOpenTasks().putIfAbsent(token, new ArrayList<>());
+        getOpenTasks().get(token).add(recipeStorage);
     }
 
-    public void finishTask(@NotNull final IToken<?> token, final boolean successful)
+    public void finishTask(@NotNull final IToken<?> token, @NotNull final IRecipeStorage recipeStorage)
     {
-        if (!getOpenTasks().contains(token))
+        if (!getOpenTasks().containsKey(token))
         {
             return;
         }
 
-        getOpenTasks().remove(token);
+        if (getOpenTasks().get(token).isEmpty())
+        {
+            getOpenTasks().remove(token);
+            return;
+        }
 
-        if (successful)
+        getOpenTasks().get(token).remove(recipeStorage);
+        if (getOpenTasks().get(token).isEmpty())
         {
+            getOpenTasks().remove(token);
+
             getColony().getRequestManager().updateRequestState(token, RequestState.POST_PROCESSING);
+            setCurrentRequestToken(null);
         }
-        else
-        {
-            getColony().getRequestManager().updateRequestState(token, RequestState.CANCELLED);
-        }
+
+        setCurrentRecipeStorage(null);
     }
 
     public void onTaskDeletion(@NotNull final IToken<?> token)
     {
         getOpenTasks().remove(token);
+    }
+
+    public IToken<?> getCurrentRequestToken()
+    {
+        return currentRequestToken;
+    }
+
+    public void setCurrentRequestToken(final IToken<?> currentRequestToken)
+    {
+        this.currentRequestToken = currentRequestToken;
+    }
+
+    public IRecipeStorage getCurrentRecipeStorage()
+    {
+        return currentRecipeStorage;
+    }
+
+    public void setCurrentRecipeStorage(final IRecipeStorage currentRecipeStorage)
+    {
+        this.currentRecipeStorage = currentRecipeStorage;
     }
 }

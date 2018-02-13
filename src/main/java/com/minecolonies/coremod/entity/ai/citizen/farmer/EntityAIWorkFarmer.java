@@ -114,7 +114,7 @@ public class EntityAIWorkFarmer extends AbstractEntityAIInteract<JobFarmer>
      */
     private AIState startWorkingAtOwnBuilding()
     {
-        if (walkToBuilding())
+        if (ifNotAtBuildingWalkTo())
         {
             return getState();
         }
@@ -263,7 +263,7 @@ public class EntityAIWorkFarmer extends AbstractEntityAIInteract<JobFarmer>
             return FARMER_PLANT;
         }
 
-        if (walkToBuilding())
+        if (ifNotAtBuildingWalkTo())
         {
             return PREPARING;
         }

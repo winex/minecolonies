@@ -20,12 +20,19 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import java.lang.ref.WeakReference;
 import java.util.Optional;
 import java.util.Random;
@@ -34,7 +41,7 @@ import java.util.Random;
  * Extra data for Citizens.
  */
 @SuppressWarnings(Suppression.BIG_CLASS)
-public class CitizenData
+public class CitizenData implements ICapabilityProvider
 {
     /**
      * Maximum saturation of a citizen.
@@ -983,5 +990,24 @@ public class CitizenData
     public boolean isRequestAsync(@NotNull final IToken token)
     {
         return job.getAsyncRequests().contains(token);
+    }
+
+    @Override
+    public boolean hasCapability(
+      @Nonnull final Capability<?> capability, @javax.annotation.Nullable final EnumFacing facing)
+    {
+        return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && facing == null;
+    }
+
+    @javax.annotation.Nullable
+    @Override
+    public <T> T getCapability(@Nonnull final Capability<T> capability, @javax.annotation.Nullable final EnumFacing facing)
+    {
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && facing == null)
+        {
+            return (T) new InvWrapper(getInventory());
+        }
+
+        return null;
     }
 }

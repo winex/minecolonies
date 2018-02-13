@@ -218,7 +218,7 @@ public abstract class AbstractEntityAIGuard extends AbstractEntityAIInteract<Job
      */
     protected AIState goToBuilding()
     {
-        if (walkToBuilding())
+        if (ifNotAtBuildingWalkTo())
         {
             return GUARD_RESTOCK;
         }

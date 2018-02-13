@@ -279,7 +279,7 @@ public class EntityAIStructureBuilder extends AbstractEntityAIStructure<JobBuild
 
     private AIState startWorkingAtOwnBuilding()
     {
-        if (walkToBuilding())
+        if (ifNotAtBuildingWalkTo())
         {
             return getState();
         }

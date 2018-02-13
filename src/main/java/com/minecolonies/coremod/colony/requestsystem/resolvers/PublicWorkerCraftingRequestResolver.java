@@ -48,7 +48,7 @@ public class PublicWorkerCraftingRequestResolver extends AbstractCraftingRequest
 
     @Override
     protected boolean canRequestBeAssignedToWorker(
-      @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request)
+      @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request, @NotNull final AbstractBuildingWorker currentBuilding)
     {
         if (manager.getColony().getWorld().isRemote)
         {
@@ -56,79 +56,54 @@ public class PublicWorkerCraftingRequestResolver extends AbstractCraftingRequest
         }
 
         final Colony colony = (Colony) manager.getColony();
-        final CitizenData freeWorker = colony.getCitizenManager().getCitizens()
-                                              .stream()
-                                              .filter(c -> c.getJob() instanceof JobSawmill)
-                                              .findFirst()
-                                              .orElse(null);
-
-        return freeWorker != null;
+        return colony.getCitizenManager().getCitizens()
+                                     .stream()
+                                     .anyMatch(citizenData -> citizenData.getJob() instanceof JobSawmill);
     }
 
-    @Nullable
     @Override
-    protected List<IToken<?>> assignRequestToWorker(
-      @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request, @NotNull final List<IToken<?>> currentChildRequests)
+    protected void performCraftingForBuilding(@NotNull final AbstractBuildingWorker worker, @NotNull final IRequestManager manager, @NotNull final IToken<?> requestToken, @NotNull final IRecipeStorage recipeStorage, final int craftingCount)
     {
         if (manager.getColony().getWorld().isRemote)
         {
-            return null;
+            return;
         }
+
+        final IRequest<?> request = manager.getRequestForToken(requestToken);
 
         final Colony colony = (Colony) manager.getColony();
-        final CitizenData freeWorker = colony.getCitizenManager().getCitizens()
-                                              .stream()
-                                              .filter(c -> c.getJob() instanceof JobSawmill)
-                                              .min(Comparator.comparing((CitizenData c) -> ((JobDeliveryman) c.getJob()).getTaskQueue().size())
-                                                     .thenComparing(Comparator.comparing(c -> {
-                                                         BlockPos targetPos = request.getRequester().getRequesterLocation().getInDimensionLocation();
-                                                         //We can do an instant get here, since we are already filtering on anything that has no entity.
-                                                         BlockPos entityLocation = c.getCitizenEntity().get().getLocation().getInDimensionLocation();
+        final CitizenData targetWorker = colony.getCitizenManager().getCitizens().stream()
+        .filter(citizenData -> citizenData.getJob() instanceof JobSawmill)
+        .filter(citizenData -> ((JobSawmill) citizenData.getJob()).getOpenTasks().containsKey(requestToken))
+        .findFirst()
+        .orElse(colony.getCitizenManager()
+                  .getCitizens()
+                  .stream()
+                  .filter(c -> c.getJob() instanceof JobSawmill)
+                  .min(Comparator.comparing((CitizenData c) -> ((JobSawmill) c.getJob()).getOpenTasks().size())
+                         .thenComparing(Comparator.comparing(c -> {
+                             BlockPos targetPos = request.getRequester().getRequesterLocation().getInDimensionLocation();
+                             //We can do an instant get here, since we are already filtering on anything that has no entity.
+                             BlockPos entityLocation = c.getCitizenEntity().get().getLocation().getInDimensionLocation();
 
-                                                         return BlockPosUtil.getDistanceSquared(targetPos, entityLocation);
-                                                     })))
-                                              .orElse(null);
+                             return BlockPosUtil.getDistanceSquared(targetPos, entityLocation);
+                         })))
+                  .orElse(null));
 
-        if (freeWorker != null)
+        if (targetWorker != null)
         {
-            final JobSawmill jobSawmil = (JobSawmill) freeWorker.getJob();
-            jobSawmil.addTask(request.getToken());
-
-            return currentChildRequests;
+            for (int i = 0; i < craftingCount; i++)
+            {
+                ((JobSawmill) targetWorker.getJob()).addTask(requestToken, recipeStorage);
+            }
         }
-
-        return null;
-    }
-
-    @Override
-    protected void performCraftingForBuilding(@NotNull final AbstractBuildingWorker worker, @NotNull final IRecipeStorage recipeStorage)
-    {
-        super.performCraftingForBuilding(worker, recipeStorage);
     }
 
     @Override
     protected void onCraftingCompleted(
       @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request)
     {
-        if (!manager.getColony().getWorld().isRemote)
-        {
-            final Colony colony = (Colony) manager.getColony();
-            final CitizenData worker = colony.getCitizenManager().getCitizens()
-                                         .stream()
-                                         .filter(c -> c.getJob() instanceof JobSawmill && ((JobSawmill) c.getJob()).getOpenTasks().contains(request.getToken()))
-                                         .findFirst()
-                                         .orElse(null);
-
-            if (worker == null)
-            {
-                MineColonies.getLogger().error("Parent cancellation failed! Unknown request: " + request.getToken());
-            }
-            else
-            {
-                final JobSawmill job = (JobSawmill) worker.getJob();
-                job.finishTask(request.getToken(), true);
-            }
-        }
+        //Noop worker completes the chain.
     }
 
     @Nullable
@@ -153,7 +128,7 @@ public class PublicWorkerCraftingRequestResolver extends AbstractCraftingRequest
             final Colony colony = (Colony) manager.getColony();
             final CitizenData worker = colony.getCitizenManager().getCitizens()
                                                   .stream()
-                                                  .filter(c -> c.getJob() instanceof JobSawmill && ((JobSawmill) c.getJob()).getOpenTasks().contains(request.getToken()))
+                                                  .filter(c -> c.getJob() instanceof JobSawmill && ((JobSawmill) c.getJob()).getOpenTasks().containsKey(request.getToken()))
                                                   .findFirst()
                                                   .orElse(null);
 

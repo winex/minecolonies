@@ -1,16 +1,19 @@
 package com.minecolonies.api.colony.requestsystem.requestable;
 
 import com.minecolonies.api.colony.requestsystem.factory.IFactoryController;
+import com.minecolonies.api.crafting.ItemStorage;
 import com.minecolonies.api.util.ItemStackUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.oredict.OreDictionary;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Predicate;
+
 /**
  * Deliverable that can only be fulfilled by a single stack with a given minimal amount of items.
  */
-public class Stack implements IDeliverable
+public class Stack implements IDeliverable, Predicate<ItemStack>
 {
     ////// --------------------------- NBTConstants --------------------------- \\\\\\
     private static final String NBT_STACK       = "Stack";
@@ -50,6 +53,11 @@ public class Stack implements IDeliverable
 
         setMatchMeta(true).setMatchNBT(true);
         this.theStack.setCount(Math.min(this.theStack.getCount(), this.theStack.getMaxStackSize()));
+    }
+
+    public Stack (@NotNull final ItemStorage itemStorage)
+    {
+        this(itemStorage.getItemStack(), !itemStorage.ignoreDamageValue(), false, false, ItemStackUtils.EMPTY);
     }
 
     /**
@@ -146,7 +154,9 @@ public class Stack implements IDeliverable
     public ItemStack getStack()
     {
         return theStack;
-    }    @Override
+    }
+
+    @Override
     public void setResult(@NotNull final ItemStack result)
     {
         this.result = result;
@@ -156,7 +166,9 @@ public class Stack implements IDeliverable
     {
         this.matchOreDic = match;
         return this;
-    }    @NotNull
+    }
+
+    @NotNull
     @Override
     public ItemStack getResult()
     {
@@ -205,6 +217,12 @@ public class Stack implements IDeliverable
         result1 = 31 * result1 + (matchOreDic ? 1 : 0);
         result1 = 31 * result1 + getResult().hashCode();
         return result1;
+    }
+
+    @Override
+    public boolean test(final ItemStack stack)
+    {
+        return this.equals(new Stack(stack, matchMeta, matchNBT, matchOreDic, getResult()));
     }
 }
 

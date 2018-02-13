@@ -6,15 +6,15 @@ import com.minecolonies.api.colony.requestsystem.factory.FactoryVoidInput;
 import com.minecolonies.api.colony.requestsystem.factory.IFactory;
 import com.minecolonies.api.colony.requestsystem.factory.IFactoryController;
 import com.minecolonies.api.colony.requestsystem.token.IToken;
+import com.minecolonies.api.crafting.IRecipeStorage;
 import com.minecolonies.api.util.NBTUtils;
 import com.minecolonies.api.util.constant.TypeConstants;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.minecolonies.api.util.constant.NbtTagConstants.*;
@@ -22,12 +22,12 @@ import static com.minecolonies.api.util.constant.NbtTagConstants.*;
 public class StandardRequestSystemCrafterJobDataStore extends StandardRequestSystemJobDataStore implements IRequestSystemCraftingJobDataStore
 {
 
-    private final List<IToken<?>> openRequests;
+    private final Map<IToken<?>, List<IRecipeStorage>> openRequests;
 
     public StandardRequestSystemCrafterJobDataStore(
       final IToken<?> id,
       final Set<IToken<?>> asyncRequestTokens,
-      final List<IToken<?>> openRequests)
+      final Map<IToken<?>, List<IRecipeStorage>> openRequests)
     {
         super(id, asyncRequestTokens);
         this.openRequests = openRequests;
@@ -36,11 +36,11 @@ public class StandardRequestSystemCrafterJobDataStore extends StandardRequestSys
     public StandardRequestSystemCrafterJobDataStore()
     {
         super();
-        this.openRequests = new LinkedList<>();
+        this.openRequests = new HashMap<>();
     }
 
     @Override
-    public List<IToken<?>> getOpenRequests()
+    public Map<IToken<?>, List<IRecipeStorage>> getOpenRequests()
     {
         return openRequests;
     }
@@ -79,7 +79,17 @@ public class StandardRequestSystemCrafterJobDataStore extends StandardRequestSys
 
             compound.setTag(TAG_TOKEN, controller.serialize(standardRequestSystemDeliveryManJobDataStore.getId()));
             compound.setTag(TAG_RS_JOB_ASYNC, standardRequestSystemDeliveryManJobDataStore.getAsyncRequestTokens().stream().map(controller::serialize).collect(NBTUtils.toNBTTagList()));
-            compound.setTag(TAG_RS_JOB_CRAFTER_TASKS, standardRequestSystemDeliveryManJobDataStore.openRequests.stream().map(controller::serialize).collect(NBTUtils.toNBTTagList()));
+            compound.setTag(TAG_RS_JOB_CRAFTER_TASKS, standardRequestSystemDeliveryManJobDataStore.openRequests.keySet().stream().map(requestToken -> {
+                final NBTTagCompound tokenCompound = controller.serialize(requestToken);
+                final NBTTagList recipeList = standardRequestSystemDeliveryManJobDataStore.getOpenRequests().get(requestToken).stream().map(controller::serialize).collect(NBTUtils.toNBTTagList());
+
+                final NBTTagCompound resultingCompound = new NBTTagCompound();
+
+                resultingCompound.setTag(TAG_TOKEN, tokenCompound);
+                resultingCompound.setTag(TAG_LIST, recipeList);
+
+                return resultingCompound;
+            }).collect(NBTUtils.toNBTTagList()));
 
             return compound;
         }
@@ -97,9 +107,13 @@ public class StandardRequestSystemCrafterJobDataStore extends StandardRequestSys
             final Set<IToken<?>> asyncRequests = NBTUtils.streamCompound(nbt.getTagList(TAG_RS_JOB_ASYNC, Constants.NBT.TAG_COMPOUND))
                                                    .map(nbtTagCompound -> (IToken<?>) controller.deserialize(nbtTagCompound))
                                                    .collect(Collectors.toSet());
-            final LinkedList<IToken<?>> openRequests = NBTUtils.streamCompound(nbt.getTagList(TAG_LIST, Constants.NBT.TAG_COMPOUND))
-                                          .map(nbtTagCompound -> (IToken<?>) controller.deserialize(nbtTagCompound))
-                                          .collect(Collectors.toCollection(LinkedList<IToken<?>>::new));
+            final Map<IToken<?>, List<IRecipeStorage>> openRequests = NBTUtils.streamCompound(nbt.getTagList(TAG_RS_JOB_CRAFTER_TASKS, Constants.NBT.TAG_COMPOUND))
+              .collect(Collectors.toMap(compound -> (IToken<?>) controller.deserialize(compound.getCompoundTag(TAG_TOKEN)),
+                compound -> NBTUtils.streamCompound(compound.getTagList(TAG_LIST, Constants.NBT.TAG_COMPOUND))
+                              .map(recipeCompound -> (IRecipeStorage) controller.deserialize(recipeCompound))
+                              .collect(Collectors.toList())
+              )
+              );
 
             return new StandardRequestSystemCrafterJobDataStore(token, asyncRequests, openRequests);
         }

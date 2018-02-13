@@ -641,14 +641,29 @@ public class InventoryUtils
      * Checked by {@link InventoryUtils#getItemCountInProvider(ICapabilityProvider,
      * Predicate)} &gt; 0;
      *
-     * @param Provider                    {@link ICapabilityProvider} to scan
+     * @param provider                    {@link ICapabilityProvider} to scan
      * @param itemStackSelectionPredicate The predicate to match the ItemStack
      *                                    to.
      * @return True when in {@link ICapabilityProvider}, otherwise false
      */
-    public static boolean hasItemInProvider(@NotNull final ICapabilityProvider Provider, @NotNull final Predicate<ItemStack> itemStackSelectionPredicate)
+    public static boolean hasItemInProvider(@NotNull final ICapabilityProvider provider, @NotNull final Predicate<ItemStack> itemStackSelectionPredicate)
     {
-        return getItemCountInProvider(Provider, itemStackSelectionPredicate) > 0;
+        return getItemCountInProvider(provider, itemStackSelectionPredicate) > 0;
+    }
+
+    /**
+     * Checks if a player has the items in the {@link ICapabilityProvider}.
+     * Checked by {@link InventoryUtils#getItemCountInProvider(ICapabilityProvider,
+     * Predicate)} &gt; 0;
+     *
+     * @param provider                    {@link ICapabilityProvider} to scan
+     * @param itemStackSelectionPredicates The predicate to match the ItemStack
+     *                                    to.
+     * @return True when in {@link ICapabilityProvider}, otherwise false
+     */
+    public static boolean hasItemsInProvider(@NotNull final ICapabilityProvider provider, @NotNull final List<Predicate<ItemStack>> itemStackSelectionPredicates)
+    {
+        return itemStackSelectionPredicates.stream().anyMatch(stackPredicate -> !hasItemInProvider(provider, stackPredicate));
     }
 
     /**

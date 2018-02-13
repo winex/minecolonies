@@ -101,7 +101,7 @@ public class EntityAIWorkSmelter extends AbstractEntityAIUsesFurnace<JobSmelter>
     private AIState smeltStuff()
     {
         worker.setLatestStatus(new TextComponentTranslation(SMELTING_DOWN));
-        if (walkToBuilding())
+        if (ifNotAtBuildingWalkTo())
         {
             return getState();
         }
@@ -262,7 +262,7 @@ public class EntityAIWorkSmelter extends AbstractEntityAIUsesFurnace<JobSmelter>
         }
         worker.setLatestStatus(new TextComponentTranslation(COM_MINECOLONIES_COREMOD_STATUS_IDLING));
         setDelay(WAIT_AFTER_REQUEST);
-        walkToBuilding();
+        ifNotAtBuildingWalkTo();
         return START_WORKING;
     }
 

@@ -81,10 +81,14 @@ public abstract class AbstractCraftingRequestResolver extends AbstractRequestRes
             return false;
         }
 
-        return building instanceof AbstractBuildingWorker && canBuildingCraftStack((AbstractBuildingWorker) building, request.getRequest().getStack()) && canRequestBeAssignedToWorker(manager, request);
+        return building instanceof AbstractBuildingWorker && canBuildingCraftStack((AbstractBuildingWorker) building, request.getRequest().getStack())
+                 && canRequestBeAssignedToWorker(manager, request, (AbstractBuildingWorker) building);
     }
 
-    protected boolean canRequestBeAssignedToWorker(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request)
+    protected boolean canRequestBeAssignedToWorker(
+      @NotNull final IRequestManager manager,
+      @NotNull final IRequest<? extends Stack> request,
+      @NotNull final AbstractBuildingWorker worker)
     {
         return true;
     }
@@ -123,7 +127,10 @@ public abstract class AbstractCraftingRequestResolver extends AbstractRequestRes
     }
 
     @Nullable
-    protected List<IToken<?>> assignRequestToWorker(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request, @NotNull final List<IToken<?>> currentChildRequests)
+    protected List<IToken<?>> assignRequestToWorker(
+      @NotNull final IRequestManager manager,
+      @NotNull final IRequest<? extends Stack> request,
+      @NotNull final List<IToken<?>> currentChildRequests)
     {
         return currentChildRequests;
     }
@@ -160,7 +167,7 @@ public abstract class AbstractCraftingRequestResolver extends AbstractRequestRes
         int craftingCount = Math.max(ItemStackUtils.getSize(outputStack), ItemStackUtils.getSize(storage.getPrimaryOutput())) / ItemStackUtils.getSize(storage.getPrimaryOutput());
 
         //Now check if we excede an ingredients max stack size.
-        for(final ItemStack ingredient : storage.getInput())
+        for (final ItemStack ingredient : storage.getInput())
         {
             if (ItemStackUtils.isEmpty(ingredient))
             {
@@ -182,20 +189,20 @@ public abstract class AbstractCraftingRequestResolver extends AbstractRequestRes
 
     @Nullable
     protected List<IToken<?>> createRequestsForRecipe(
-            @NotNull final IRequestManager manager,
-            @NotNull final AbstractBuildingWorker building,
-            final ItemStack requestStack,
-            @NotNull final IRecipeStorage storage)
+      @NotNull final IRequestManager manager,
+      @NotNull final AbstractBuildingWorker building,
+      final ItemStack requestStack,
+      @NotNull final IRecipeStorage storage)
     {
         final int craftingCount = calculateMaxCraftingCount(requestStack, storage);
         return storage.getCleanedInput().stream()
                  .filter(s -> !ItemStackUtils.isEmpty(s.getItemStack()))
                  .map(stack -> {
-                    final ItemStack craftingHelperStack = stack.getItemStack().copy();
-                    ItemStackUtils.setSize(craftingHelperStack, stack.getAmount() * craftingCount);
+                     final ItemStack craftingHelperStack = stack.getItemStack().copy();
+                     ItemStackUtils.setSize(craftingHelperStack, stack.getAmount() * craftingCount);
 
-                    return createNewRequestForStack(manager, craftingHelperStack);
-                }).collect(Collectors.toList());
+                     return createNewRequestForStack(manager, craftingHelperStack);
+                 }).collect(Collectors.toList());
     }
 
     @Nullable
@@ -224,17 +231,22 @@ public abstract class AbstractCraftingRequestResolver extends AbstractRequestRes
         }
 
         final int craftingCount = calculateMaxCraftingCount(request.getRequest().getStack(), storage);
-        for (int i = 0; i < craftingCount; i++)
-        {
-            performCraftingForBuilding(buildingWorker, storage);
-        }
 
+        performCraftingForBuilding(buildingWorker, manager, request.getToken(), storage, craftingCount);
         onCraftingCompleted(manager, request);
     }
 
-    protected void performCraftingForBuilding(@NotNull final AbstractBuildingWorker worker, @NotNull final IRecipeStorage recipeStorage)
+    protected void performCraftingForBuilding(
+      @NotNull final AbstractBuildingWorker worker,
+      @NotNull final IRequestManager manager,
+      @NotNull final IToken<?> requestToken,
+      @NotNull final IRecipeStorage recipeStorage,
+      final int craftingCount)
     {
-        worker.fullFillRecipe(recipeStorage);
+        for (int i = 0; i < craftingCount; i++)
+        {
+            worker.fullFillRecipe(recipeStorage);
+        }
     }
 
     protected void onCraftingCompleted(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request)

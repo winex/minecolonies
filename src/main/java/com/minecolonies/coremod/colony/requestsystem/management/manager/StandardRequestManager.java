@@ -339,6 +339,11 @@ public class StandardRequestManager implements IStandardRequestManager
     @Override
     public IDataStoreManager getDataStoreManager()
     {
+        if (dataStoreManager == null)
+        {
+            reset();
+        }
+
         return dataStoreManager;
     }
 

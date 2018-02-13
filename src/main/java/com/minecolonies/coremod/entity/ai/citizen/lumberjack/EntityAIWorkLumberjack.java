@@ -199,7 +199,7 @@ public class EntityAIWorkLumberjack extends AbstractEntityAIInteract<JobLumberja
      */
     private AIState startWorkingAtOwnBuilding()
     {
-        if (walkToBuilding())
+        if (ifNotAtBuildingWalkTo())
         {
             return getState();
         }
@@ -521,7 +521,7 @@ public class EntityAIWorkLumberjack extends AbstractEntityAIInteract<JobLumberja
             this.getOwnBuilding().getColony().getStatsManager().incrementStatistic("saplings");
         }
 
-        if(timeWaited >= MAX_WAITING_TIME/2 && !checkedInHut && !walkToBuilding())
+        if(timeWaited >= MAX_WAITING_TIME/2 && !checkedInHut && !ifNotAtBuildingWalkTo())
         {
             isInHut(new ItemStack(Blocks.SAPLING, 1, job.tree.getVariant()));
             checkedInHut = true;

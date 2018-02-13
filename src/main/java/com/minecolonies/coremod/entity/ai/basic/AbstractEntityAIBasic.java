@@ -254,7 +254,7 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob> extends Abstr
     {
         if (!job.hasCheckedForFoodToday())
         {
-            if (walkToBuilding())
+            if (ifNotAtBuildingWalkTo())
             {
                 return IDLE;
             }
@@ -469,7 +469,7 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob> extends Abstr
         {
             return IDLE;
         }
-        if (!walkToBuilding() && getOwnBuilding().hasCitizenCompletedRequests(worker.getCitizenData()))
+        if (!ifNotAtBuildingWalkTo() && getOwnBuilding().hasCitizenCompletedRequests(worker.getCitizenData()))
         {
             delay += DELAY_RECHECK;
 
@@ -532,7 +532,7 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob> extends Abstr
      *
      * @return false if the worker is at his building
      */
-    protected final boolean walkToBuilding()
+    protected final boolean ifNotAtBuildingWalkTo()
     {
         @Nullable final AbstractBuildingWorker ownBuilding = getOwnBuilding();
         //Return true if the building is null to stall the worker
@@ -809,7 +809,7 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob> extends Abstr
         }
 
         delay += DELAY_RECHECK;
-        return walkToBuilding() || !retrieveToolInHut(toolType, minimalLevel);
+        return ifNotAtBuildingWalkTo() || !retrieveToolInHut(toolType, minimalLevel);
     }
 
     /**
@@ -851,7 +851,7 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob> extends Abstr
      * @return INVENTORY_FULL | IDLE
      */
     @NotNull
-    private AIState dumpInventory()
+    protected AIState dumpInventory()
     {
         if (!worker.isWorkerAtSiteWithMove(getOwnBuilding().getLocation(), DEFAULT_RANGE_FOR_DELAY))
         {
@@ -887,7 +887,7 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob> extends Abstr
         @Nullable final AbstractBuildingWorker buildingWorker = getOwnBuilding();
 
         return buildingWorker != null
-                 && (walkToBuilding()
+                 && (ifNotAtBuildingWalkTo()
                        || InventoryFunctions.matchFirstInHandlerWithAction(new InvWrapper(worker.getInventoryCitizen()),
           itemStack -> !ItemStackUtils.isEmpty(itemStack) && !buildingWorker.buildingRequiresCertainAmountOfItem(itemStack, alreadyKept),
           (handler, slot) ->
@@ -1223,10 +1223,10 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob> extends Abstr
      */
     public boolean tryTransferFromPosToWorker(final BlockPos pos, @NotNull final Predicate<ItemStack> predicate)
     {
-        return InventoryUtils.transferXOfFirstSlotInProviderWithIntoNextFreeSlotInItemHandler(
-          (ICapabilityProvider) world.getTileEntity(pos),
+        return InventoryUtils.transferXOfFirstSlotInProviderWithIntoNextFreeSlotInProvider(
+          world.getTileEntity(pos),
           predicate,
           Constants.STACKSIZE,
-          new InvWrapper(worker.getInventoryCitizen()));
+          worker.getCitizenData());
     }
 }

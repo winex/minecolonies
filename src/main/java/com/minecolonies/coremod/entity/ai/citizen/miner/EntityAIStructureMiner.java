@@ -108,7 +108,7 @@ public class EntityAIStructureMiner extends AbstractEntityAIStructure<JobMiner>
     @NotNull
     private AIState startWorkingAtOwnBuilding()
     {
-        if (worker.posY >= getOwnBuilding().getLocation().getY() && walkToBuilding())
+        if (worker.posY >= getOwnBuilding().getLocation().getY() && ifNotAtBuildingWalkTo())
         {
             return START_WORKING;
         }
@@ -479,7 +479,7 @@ public class EntityAIStructureMiner extends AbstractEntityAIStructure<JobMiner>
     @NotNull
     private AIState doShaftBuilding()
     {
-        if (walkToBuilding())
+        if (ifNotAtBuildingWalkTo())
         {
             return MINER_BUILDING_SHAFT;
         }

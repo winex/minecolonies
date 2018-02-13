@@ -159,7 +159,7 @@ public abstract class AbstractEntityAIHerder<J extends AbstractJob, T extends En
     private AIState startWorkingAtOwnBuilding()
     {
         worker.setLatestStatus(new TextComponentTranslation(TranslationConstants.COM_MINECOLONIES_COREMOD_STATUS_HERDER_GOINGTOHUT));
-        if (walkToBuilding())
+        if (ifNotAtBuildingWalkTo())
         {
             return getState();
         }

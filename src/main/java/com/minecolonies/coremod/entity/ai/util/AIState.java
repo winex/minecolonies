@@ -357,5 +357,24 @@ public enum AIState
     /**
      * Shear a sheep!
      */
-    SHEPHERD_SHEAR
+    SHEPHERD_SHEAR,
+
+    /*
+### Crafter ###
+     */
+
+    /**
+     * Collect items for craft.!
+     */
+    COLLECT_ITEMS,
+
+    /**
+     * Crafts the item.
+     */
+    CRAFT,
+
+    /**
+     * Returns the result to the building.
+     */
+    RETURN_RESULT
 }
