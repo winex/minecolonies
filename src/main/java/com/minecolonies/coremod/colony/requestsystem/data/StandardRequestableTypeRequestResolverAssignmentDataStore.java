@@ -28,7 +28,8 @@ public class StandardRequestableTypeRequestResolverAssignmentDataStore implement
 
     public StandardRequestableTypeRequestResolverAssignmentDataStore(
       final IToken<?> id,
-      final Map<TypeToken<?>, Collection<IToken<?>>> assignments) {
+      final Map<TypeToken<?>, Collection<IToken<?>>> assignments)
+    {
         this.id = id;
         this.assignments = assignments;
     }
@@ -59,7 +60,6 @@ public class StandardRequestableTypeRequestResolverAssignmentDataStore implement
 
     public static class Factory implements IFactory<FactoryVoidInput, StandardRequestableTypeRequestResolverAssignmentDataStore>
     {
-
         @NotNull
         @Override
         public TypeToken<? extends StandardRequestableTypeRequestResolverAssignmentDataStore> getFactoryOutputType()
@@ -77,7 +77,7 @@ public class StandardRequestableTypeRequestResolverAssignmentDataStore implement
         @NotNull
         @Override
         public StandardRequestableTypeRequestResolverAssignmentDataStore getNewInstance(
-          @NotNull final IFactoryController factoryController, @NotNull final FactoryVoidInput factoryVoidInput, @NotNull final Object... context) throws IllegalArgumentException
+          @NotNull final IFactoryController factoryController, @NotNull final FactoryVoidInput factoryVoidInput, @NotNull final Object... context)
         {
             return new StandardRequestableTypeRequestResolverAssignmentDataStore();
         }
@@ -88,7 +88,7 @@ public class StandardRequestableTypeRequestResolverAssignmentDataStore implement
           @NotNull final IFactoryController controller,
           @NotNull final StandardRequestableTypeRequestResolverAssignmentDataStore standardRequestableTypeRequestResolverAssignmentDataStore)
         {
-            NBTTagCompound compound = new NBTTagCompound();
+            final NBTTagCompound compound = new NBTTagCompound();
 
             compound.setTag(NbtTagConstants.TAG_TOKEN, controller.serialize(standardRequestableTypeRequestResolverAssignmentDataStore.id));
             compound.setTag(NbtTagConstants.TAG_LIST, standardRequestableTypeRequestResolverAssignmentDataStore.assignments.keySet().stream().map(t -> {
@@ -110,8 +110,8 @@ public class StandardRequestableTypeRequestResolverAssignmentDataStore implement
         public StandardRequestableTypeRequestResolverAssignmentDataStore deserialize(@NotNull final IFactoryController controller, @NotNull final NBTTagCompound nbt)
           throws Throwable
         {
-            IToken<?> token = controller.deserialize(nbt.getCompoundTag(NbtTagConstants.TAG_TOKEN));
-            Map<TypeToken<?>, Collection<IToken<?>>> map = NBTUtils.streamCompound(nbt.getTagList(NbtTagConstants.TAG_LIST, Constants.NBT.TAG_COMPOUND))
+            final IToken<?> token = controller.deserialize(nbt.getCompoundTag(NbtTagConstants.TAG_TOKEN));
+            final Map<TypeToken<?>, Collection<IToken<?>>> map = NBTUtils.streamCompound(nbt.getTagList(NbtTagConstants.TAG_LIST, Constants.NBT.TAG_COMPOUND))
                                                           .map(nbtTagCompound -> {
                                                               final TypeToken<?> elementToken = controller.deserialize(nbtTagCompound.getCompoundTag(NbtTagConstants.TAG_TOKEN));
                                                               final Collection<IToken<?>> elements = NBTUtils.streamCompound(nbtTagCompound.getTagList(NbtTagConstants.TAG_LIST,
@@ -119,7 +119,7 @@ public class StandardRequestableTypeRequestResolverAssignmentDataStore implement
                                                                                                        .collect(Collectors.toList());
 
                                                               return new Tuple<>(elementToken, elements);
-                                                          }).collect(Collectors.toMap(t -> t.getFirst(), t -> t.getSecond()));
+                                                          }).collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
 
             return new StandardRequestableTypeRequestResolverAssignmentDataStore(token, map);
         }
