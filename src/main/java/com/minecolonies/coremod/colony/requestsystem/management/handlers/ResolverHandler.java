@@ -13,6 +13,7 @@ import com.minecolonies.coremod.colony.requestsystem.management.manager.wrapped.
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.minecolonies.api.util.constant.Suppression.RAWTYPES;
@@ -73,6 +74,7 @@ public final class ResolverHandler
 
         @SuppressWarnings(RAWTYPES) final Set<TypeToken> resolverTypes = ReflectionUtils.getSuperClasses(resolver.getRequestType());
         resolverTypes.remove(TypeConstants.OBJECT);
+        resolverTypes.removeIf(typeToken -> typeToken.isSubtypeOf(TypeToken.of(Predicate.class)));
         resolverTypes.forEach(c -> {
             if (!manager.getRequestableTypeRequestResolverAssignmentDataStore().getAssignments().containsKey(c))
             {

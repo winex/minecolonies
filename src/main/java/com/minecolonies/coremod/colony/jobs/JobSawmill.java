@@ -26,8 +26,6 @@ import java.util.Map;
  */
 public class JobSawmill extends AbstractJob<IRequestSystemCraftingJobDataStore>
 {
-    private IToken<?> rsDataStoreToken;
-
     private IToken<?> currentRequestToken;
     private IRecipeStorage currentRecipeStorage;
 
@@ -39,35 +37,6 @@ public class JobSawmill extends AbstractJob<IRequestSystemCraftingJobDataStore>
     public JobSawmill(final CitizenData entity)
     {
         super(entity, TypeConstants.REQUEST_SYSTEM_CRAFTING_JOB_DATA_STORE);
-        setupRsDataStore();
-    }
-
-    private void setupRsDataStore()
-    {
-        rsDataStoreToken = this.getCitizen()
-                             .getColony()
-                             .getRequestManager()
-                             .getDataStoreManager()
-                             .get(
-                               StandardFactoryController.getInstance().getNewInstance(TypeConstants.ITOKEN),
-                               TypeConstants.REQUEST_SYSTEM_DELIVERY_MAN_JOB_DATA_STORE
-                             )
-                             .getId();
-    }
-
-    @Override
-    public void readFromNBT(@NotNull final NBTTagCompound compound)
-    {
-        super.readFromNBT(compound);
-
-        if(compound.hasKey(NbtTagConstants.TAG_RS_DMANJOB_DATASTORE))
-        {
-            rsDataStoreToken = StandardFactoryController.getInstance().deserialize(compound.getCompoundTag(NbtTagConstants.TAG_RS_DMANJOB_DATASTORE));
-        }
-        else
-        {
-            setupRsDataStore();
-        }
     }
 
     @NotNull
@@ -82,13 +51,6 @@ public class JobSawmill extends AbstractJob<IRequestSystemCraftingJobDataStore>
     public RenderBipedCitizen.Model getModel()
     {
         return RenderBipedCitizen.Model.CRAFTER;
-    }
-
-    @Override
-    public void writeToNBT(@NotNull final NBTTagCompound compound)
-    {
-        super.writeToNBT(compound);
-        compound.setTag(NbtTagConstants.TAG_RS_DMANJOB_DATASTORE, StandardFactoryController.getInstance().serialize(rsDataStoreToken));
     }
 
     /**

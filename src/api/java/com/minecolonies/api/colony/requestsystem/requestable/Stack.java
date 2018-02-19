@@ -58,6 +58,7 @@ public class Stack implements IDeliverable, Predicate<ItemStack>
     public Stack (@NotNull final ItemStorage itemStorage)
     {
         this(itemStorage.getItemStack(), !itemStorage.ignoreDamageValue(), false, false, ItemStackUtils.EMPTY);
+        this.theStack.setCount(itemStorage.getAmount());
     }
 
     /**
