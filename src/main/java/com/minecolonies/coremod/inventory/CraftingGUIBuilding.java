@@ -78,12 +78,7 @@ public class CraftingGUIBuilding extends Container
      * Total amount of slots in the GUI.
      */
     private static final int TOTAL_SLOTS = 41;
-
-    /**
-     * Amount of slots in the crafting window.
-     */
-    private static final int CRAFTING_SLOTS = 5;
-
+    
     /**
      * The crafting matrix inventory (2x2).
      */
