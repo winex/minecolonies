@@ -5,6 +5,7 @@ import com.minecolonies.api.colony.requestsystem.StandardFactoryController;
 import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.api.crafting.IRecipeStorage;
 import com.minecolonies.api.util.BlockPosUtil;
+import com.minecolonies.api.util.LanguageHandler;
 import com.minecolonies.api.util.constant.TypeConstants;
 import com.minecolonies.coremod.colony.Colony;
 import com.minecolonies.coremod.colony.ColonyManager;
@@ -12,10 +13,12 @@ import com.minecolonies.coremod.colony.buildings.AbstractBuilding;
 import com.minecolonies.coremod.colony.buildings.AbstractBuildingWorker;
 import com.minecolonies.coremod.colony.buildings.views.AbstractBuildingView;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import org.jetbrains.annotations.NotNull;
 
@@ -156,7 +159,11 @@ public class AddRemoveRecipeMessage extends AbstractMessage<AddRemoveRecipeMessa
             {
                 if (!((AbstractBuildingWorker) buildingWorker).addRecipe(token))
                 {
-                    player.sendMessage(new TextComponentString(UNABLE_TO_ADD_RECIPE_MESSAGE));
+                    LanguageHandler.sendPlayerMessage(player, UNABLE_TO_ADD_RECIPE_MESSAGE, ((AbstractBuildingWorker) buildingWorker).getJobName());
+                }
+                else
+                {
+                    LanguageHandler.sendPlayerMessage(player, "com.minecolonies.coremod.gui.recipe.done");
                 }
             }
 

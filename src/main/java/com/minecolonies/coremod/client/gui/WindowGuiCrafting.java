@@ -119,7 +119,7 @@ public class WindowGuiCrafting extends GuiContainer
 
         this.doneButton = this.addButton(new GuiButton(0, guiLeft + BUTTON_X_OFFSET, guiTop + BUTTON_Y_POS, BUTTON_WIDTH, BUTTON_HEIGHT, I18n.format("gui.done")));
 
-        if(building.canRecipeBeAdded())
+        if(!building.canRecipeBeAdded())
         {
             this.doneButton.displayString = LanguageHandler.format("com.minecolonies.coremod.gui.recipe.full");
             this.doneButton.enabled = false;
@@ -131,7 +131,7 @@ public class WindowGuiCrafting extends GuiContainer
     {
         super.mouseClicked(mouseX, mouseY, mouseButton);
 
-        if (doneButton.isMouseOver())
+        if (building.canRecipeBeAdded() && doneButton.isMouseOver())
         {
             final List<ItemStack> input = new LinkedList<>();
             final List<ItemStack> secondaryOutput = new ArrayList<>();
@@ -155,7 +155,6 @@ public class WindowGuiCrafting extends GuiContainer
             if(!ItemStackUtils.isEmpty(primaryOutput))
             {
                 MineColonies.getNetwork().sendToServer(new AddRemoveRecipeMessage(input, completeCrafting ? 3 : 2, primaryOutput, secondaryOutput, building, false));
-                LanguageHandler.sendPlayerMessage(Minecraft.getMinecraft().player, "com.minecolonies.coremod.gui.recipe.done");
             }
         }
     }
