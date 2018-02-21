@@ -422,13 +422,15 @@ public abstract class AbstractBuildingWorker extends AbstractBuildingHut
      * Add a recipe to the building.
      * @param token the id of the recipe.
      */
-    public void addRecipe(final IToken token)
+    public boolean addRecipe(final IToken token)
     {
         if(canRecipeBeAdded(token))
         {
             recipes.add(token);
             markDirty();
+            return true;
         }
+        return false;
     }
 
     /**

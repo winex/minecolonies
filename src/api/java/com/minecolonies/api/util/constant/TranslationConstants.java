@@ -219,7 +219,8 @@ public final class TranslationConstants
     public static final String SMELTING_DOWN                                                       = "com.minecolonies.coremod.status.smeltingdown";
     @NonNls
     public static final String BUILDING_LEVEL_TOO_LOW                                              = "com.minecolonies.coremod.request.toolow";
-
+    @NonNls
+    public static final String UNABLE_TO_ADD_RECIPE_MESSAGE                                        = "com.minecolonies.coremod.recipe.unable";
     private TranslationConstants()
     {
         //empty default

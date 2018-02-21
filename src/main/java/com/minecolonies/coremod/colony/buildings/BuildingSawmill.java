@@ -2,6 +2,7 @@ package com.minecolonies.coremod.colony.buildings;
 
 import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.api.crafting.IRecipeStorage;
+import com.minecolonies.api.util.ItemStackUtils;
 import com.minecolonies.blockout.views.Window;
 import com.minecolonies.coremod.client.gui.WindowHutWorkerPlaceholder;
 import com.minecolonies.coremod.colony.CitizenData;
@@ -12,6 +13,7 @@ import com.minecolonies.coremod.colony.jobs.AbstractJob;
 import com.minecolonies.coremod.colony.jobs.JobSawmill;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.oredict.OreDictionary;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,8 +21,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public class BuildingSawmill extends AbstractBuildingCrafter
 {
+    /**
+     * Description string of the building.
+     */
+    private static final String SAWMILL              = "Sawmill";
 
-    private static final String SAWMILL = "Sawmill";
+    /**
+     * The min percentage something has to have out of wood to be craftable by this worker.
+     */
+    private static final double MIN_PERCENTAGE_TO_CRAFT = 0.75;
 
     /**
      * Instantiates a new sawmill building.
@@ -75,12 +84,29 @@ public class BuildingSawmill extends AbstractBuildingCrafter
             return false;
         }
 
+        int amountOfValidBlocks = 0;
+        int blocks = 0;
         for(final ItemStack stack : storage.getInput())
         {
-
+            if(!ItemStackUtils.isEmpty(stack))
+            {
+                for(final int id: OreDictionary.getOreIDs(stack))
+                {
+                    final String name = OreDictionary.getOreName(id);
+                    if(name.contains("Wood"))
+                    {
+                        amountOfValidBlocks++;
+                    }
+                    else if(name.contains("ingots") || name.contains("stone") || name.contains("redstone"))
+                    {
+                        return false;
+                    }
+                }
+                blocks++;
+            }
         }
-        
-        return true;
+
+        return amountOfValidBlocks > 0 && blocks/amountOfValidBlocks > MIN_PERCENTAGE_TO_CRAFT;
     }
 
     /**

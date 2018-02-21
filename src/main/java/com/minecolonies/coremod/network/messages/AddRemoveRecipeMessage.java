@@ -15,10 +15,13 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+
+import static com.minecolonies.api.util.constant.TranslationConstants.UNABLE_TO_ADD_RECIPE_MESSAGE;
 
 /**
  * Message class to add and remove recipes.
@@ -151,12 +154,13 @@ public class AddRemoveRecipeMessage extends AbstractMessage<AddRemoveRecipeMessa
             }
             else
             {
-                ((AbstractBuildingWorker) buildingWorker).addRecipe(token);
+                if (!((AbstractBuildingWorker) buildingWorker).addRecipe(token))
+                {
+                    player.sendMessage(new TextComponentString(UNABLE_TO_ADD_RECIPE_MESSAGE));
+                }
             }
 
             buildingWorker.markDirty();
-
-
         }
     }
 }

@@ -667,3 +667,4 @@ tile.minecolonies.blockTimberFrame_dark_oak_horizontalplain.name= Dark Oak Horiz
 tile.minecolonies.blockTimberFrame_dark_oak_horizontalnocap.name= Dark Oak Horizontal Timber Frame
 
 com.minecolonies.coremod.request.toolow=Can't mine block %s at %s. Need to upgrade the building to use a tool with hihgher mining level.
+com.minecolonies.coremod.recipe.unable=Unable to store the recipe in the building, either it has too many stored already, or it doesn't correspond with its profession.
