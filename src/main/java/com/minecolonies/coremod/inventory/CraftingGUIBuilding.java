@@ -15,18 +15,10 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import static com.minecolonies.api.util.constant.InventoryConstants.*;
+
 public class CraftingGUIBuilding extends Container
 {
-    /**
-     * Amount of rows in the player inventory.
-     */
-    private static final int PLAYER_INVENTORY_ROWS = 3;
-
-    /**
-     * Amount of columns in the player inventory.
-     */
-    private static final int PLAYER_INVENTORY_COLUMNS = 9;
-
     /**
      * Initial x-offset of the inventory slot.
      */
@@ -86,6 +78,11 @@ public class CraftingGUIBuilding extends Container
      * Total amount of slots in the GUI.
      */
     private static final int TOTAL_SLOTS = 41;
+
+    /**
+     * Amount of slots in the crafting window.
+     */
+    private static final int CRAFTING_SLOTS = 5;
 
     /**
      * The crafting matrix inventory (2x2).
@@ -181,25 +178,27 @@ public class CraftingGUIBuilding extends Container
             }
         }
 
+        // Player inventory slots
+        // Note: The slot numbers are within the player inventory and may be the same as the field inventory.
         int i;
-        for (i = 0; i < PLAYER_INVENTORY_ROWS; i++)
+        for (i = 0; i < INVENTORY_ROWS; i++)
         {
-            for (int j = 0; j < PLAYER_INVENTORY_COLUMNS; j++)
+            for (int j = 0; j < INVENTORY_COLUMNS; j++)
             {
                 addSlotToContainer(new Slot(
                         playerInventory,
-                        j + i * PLAYER_INVENTORY_COLUMNS + PLAYER_INVENTORY_COLUMNS,
-                        PLAYER_INVENTORY_INITIAL_X_OFFSET + j * INVENTORY_OFFSET_EACH,
-                        PLAYER_INVENTORY_INITIAL_Y_OFFSET + i * INVENTORY_OFFSET_EACH
+                        j + i * INVENTORY_COLUMNS + INVENTORY_COLUMNS,
+                        PLAYER_INVENTORY_INITIAL_X_OFFSET + j * PLAYER_INVENTORY_OFFSET_EACH,
+                        PLAYER_INVENTORY_INITIAL_Y_OFFSET + i * PLAYER_INVENTORY_OFFSET_EACH
                 ));
             }
         }
 
-        for (i = 0; i < PLAYER_INVENTORY_COLUMNS; i++)
+        for (i = 0; i < INVENTORY_COLUMNS; i++)
         {
             addSlotToContainer(new Slot(
                     playerInventory, i,
-                    PLAYER_INVENTORY_INITIAL_X_OFFSET + i * INVENTORY_OFFSET_EACH,
+                    PLAYER_INVENTORY_INITIAL_X_OFFSET + i * PLAYER_INVENTORY_OFFSET_EACH,
                     PLAYER_INVENTORY_HOTBAR_OFFSET
             ));
         }
@@ -301,19 +300,16 @@ public class CraftingGUIBuilding extends Container
 
         ItemStack itemstack = ItemStackUtils.EMPTY;
         final Slot slot = this.inventorySlots.get(index);
-
         if (slot != null && slot.getHasStack())
         {
             final ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
-
             if (index == 0)
             {
                 if (!this.mergeItemStack(itemstack1, CRAFTING_SLOTS + (complete ? ADDITIONAL_SLOTS : 0), TOTAL_SLOTS+ (complete ? ADDITIONAL_SLOTS : 0), true))
                 {
                     return ItemStackUtils.EMPTY;
                 }
-
                 slot.onSlotChange(itemstack1, itemstack);
             }
             else if (index < HOTBAR_START)
@@ -329,7 +325,6 @@ public class CraftingGUIBuilding extends Container
             {
                 return null;
             }
-
             if (itemstack1.getCount() == 0)
             {
                 slot.putStack(ItemStackUtils.EMPTY);
@@ -338,15 +333,11 @@ public class CraftingGUIBuilding extends Container
             {
                 slot.onSlotChanged();
             }
-
             if (itemstack1.getCount() == itemstack.getCount())
             {
                 return ItemStackUtils.EMPTY;
             }
-
-            slot.onTake(playerIn, itemstack1);
         }
-
         return itemstack;
     }
 
