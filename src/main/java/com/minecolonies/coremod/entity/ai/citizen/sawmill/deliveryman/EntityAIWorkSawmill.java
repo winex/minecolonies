@@ -144,7 +144,18 @@ public class EntityAIWorkSawmill extends AbstractEntityAIInteract<JobSawmill>
                     return START_WORKING;
                 }
 
+                needsCurrently.remove(targetPredicate);
                 walkTo = null;
+
+                if (needsCurrently.isEmpty())
+                {
+                    return CRAFT;
+                }
+            }
+            else
+            {
+                needsCurrently.clear();
+                return CRAFT;
             }
         }
 
@@ -170,7 +181,7 @@ public class EntityAIWorkSawmill extends AbstractEntityAIInteract<JobSawmill>
 
         incrementActionsDone();
 
-        return RETURN_RESULT;
+        return START_WORKING;
     }
 
     @Override

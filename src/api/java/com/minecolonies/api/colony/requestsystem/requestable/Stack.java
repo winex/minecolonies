@@ -223,7 +223,7 @@ public class Stack implements IDeliverable, Predicate<ItemStack>
     @Override
     public boolean test(final ItemStack stack)
     {
-        return this.equals(new Stack(stack, matchMeta, matchNBT, matchOreDic, getResult()));
+        return matches(stack) && stack.getCount() >= getStack().getCount();
     }
 }
 
