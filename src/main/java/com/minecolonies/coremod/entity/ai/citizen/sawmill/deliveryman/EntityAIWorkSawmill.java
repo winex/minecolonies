@@ -1,6 +1,7 @@
 package com.minecolonies.coremod.entity.ai.citizen.sawmill.deliveryman;
 
 import com.minecolonies.coremod.colony.jobs.JobSawmill;
+import com.minecolonies.coremod.entity.ai.basic.AbstractEntityAICrafter;
 import com.minecolonies.coremod.entity.ai.basic.AbstractEntityAIInteract;
 import com.minecolonies.coremod.entity.ai.util.AITarget;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +13,7 @@ import static com.minecolonies.coremod.entity.ai.util.AIState.*;
 /**
  * Crafts wood related block when needed.
  */
-public class EntityAIWorkSawmill extends AbstractEntityAIInteract<JobSawmill>
+public class EntityAIWorkSawmill extends AbstractEntityAICrafter
 {
     /**
      * Initialize the sawmill and add all his tasks.

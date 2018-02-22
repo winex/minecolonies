@@ -26,7 +26,7 @@ import static com.minecolonies.coremod.entity.ai.util.AIState.*;
 /**
  * Crafts wood related block when needed.
  */
-public abstract class AbstractEntityAICrafter extends AbstractEntityAIInteract<AbstractJobCrafter>
+public abstract class AbstractEntityAICrafter<J extends AbstractJobCrafter> extends AbstractEntityAIInteract<AbstractJobCrafter>
 {
 
     /**
@@ -56,6 +56,7 @@ public abstract class AbstractEntityAICrafter extends AbstractEntityAIInteract<A
           /**
            * Check if tasks should be executed.
            */
+          new AITarget(IDLE, START_WORKING),
           new AITarget(START_WORKING, this::startWorking),
           new AITarget(COLLECT_ITEMS, this::collectItems),
           new AITarget(CRAFT, this::craft)
