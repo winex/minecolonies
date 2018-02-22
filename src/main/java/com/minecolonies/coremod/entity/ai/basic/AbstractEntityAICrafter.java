@@ -5,6 +5,7 @@ import com.minecolonies.api.colony.requestsystem.request.RequestState;
 import com.minecolonies.api.colony.requestsystem.requestable.Stack;
 import com.minecolonies.api.crafting.IRecipeStorage;
 import com.minecolonies.api.util.InventoryUtils;
+import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.coremod.colony.jobs.AbstractJobCrafter;
 import com.minecolonies.coremod.entity.ai.util.AIState;
 import com.minecolonies.coremod.entity.ai.util.AITarget;
@@ -135,8 +136,8 @@ public abstract class AbstractEntityAICrafter<J extends AbstractJobCrafter> exte
                     return getState();
                 }
 
-                final boolean successfulTransfer = tryTransferFromPosToWorker(walkTo, targetPredicate);
-                if (!successfulTransfer)
+                tryTransferFromPosToWorker(walkTo, targetPredicate);
+                if (!InventoryUtils.hasItemInProvider(worker.getCitizenData(), targetPredicate))
                 {
                     worker.getColony().getRequestManager().updateRequestState(job.getCurrentRequestToken(), RequestState.CANCELLED);
                     return START_WORKING;

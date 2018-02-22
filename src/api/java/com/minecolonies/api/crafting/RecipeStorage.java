@@ -234,13 +234,13 @@ public class RecipeStorage implements IRecipeStorage
             return false;
         }
 
-        for (final ItemStack stack : input)
+        for (final ItemStorage stack : getCleanedInput())
         {
-            int amountNeeded = ItemStackUtils.getSize(stack);
+            int amountNeeded = stack.getAmount();
             for (final IItemHandler handler : handlers)
             {
                 final int slotOfStack = InventoryUtils.
-                        findFirstSlotInItemHandlerNotEmptyWith(handler, itemStack -> !ItemStackUtils.isEmpty(itemStack) && itemStack.isItemEqual(stack));
+                        findFirstSlotInItemHandlerNotEmptyWith(handler, itemStack -> !ItemStackUtils.isEmpty(itemStack) && itemStack.isItemEqual(stack.getItemStack()));
 
                 while (slotOfStack != -1)
                 {
