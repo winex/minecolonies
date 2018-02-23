@@ -580,6 +580,11 @@ public class EntityAIWorkDeliveryman extends AbstractEntityAIInteract<JobDeliver
             return START_WORKING;
         }
 
+        if(walkToBlock(location.getInDimensionLocation()))
+        {
+            return getState();
+        }
+
         final TileEntity tileEntity = world.getTileEntity(location.getInDimensionLocation());
         if (tileEntity instanceof TileEntityChest && !(tileEntity instanceof TileEntityColonyBuilding))
         {
@@ -596,7 +601,7 @@ public class EntityAIWorkDeliveryman extends AbstractEntityAIInteract<JobDeliver
             this.world.notifyNeighborsOfStateChange(tileEntity.getPos().down(), tileEntity.getBlockType(), true);
         }
 
-        if (isInTileEntity(tileEntity, request.getRequest().getStack()))
+        if (checkIfInTileEntityAndRetrieve(tileEntity, request.getRequest().getStack()))
         {
             setDelay(DUMP_AND_GATHER_DELAY);
             return DELIVERY;

@@ -80,7 +80,7 @@ public class RecipeStorage implements IRecipeStorage
                 continue;
             }
 
-            ItemStorage storage = new ItemStorage(stack);
+            ItemStorage storage = new ItemStorage(stack.copy());
             if(items.contains(storage))
             {
                 final int index = items.indexOf(storage);
@@ -203,8 +203,10 @@ public class RecipeStorage implements IRecipeStorage
         final List<ItemStack> secondaryStacks = new ArrayList<>();
         for(final ItemStack stack: input)
         {
-            stack.getItem().getContainerItem(stack);
+            secondaryStacks.add(stack.getItem().getContainerItem(stack));
         }
+        secondaryStacks.add(getPrimaryOutput());
+
         if(secondaryStacks.size() > getInput().size())
         {
             int freeSpace = 0;

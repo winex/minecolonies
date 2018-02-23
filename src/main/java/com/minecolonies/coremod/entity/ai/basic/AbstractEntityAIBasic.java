@@ -554,7 +554,7 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob> extends Abstr
         boolean hasItem;
         if (building != null)
         {
-            hasItem = isInTileEntity(building.getTileEntity(), is);
+            hasItem = checkIfInTileEntityAndRetrieve(building.getTileEntity(), is);
 
             if (hasItem)
             {
@@ -566,7 +566,7 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob> extends Abstr
                 final TileEntity entity = world.getTileEntity(pos);
                 if (entity instanceof TileEntityChest)
                 {
-                    hasItem = isInTileEntity((TileEntityChest) entity, is);
+                    hasItem = checkIfInTileEntityAndRetrieve((TileEntityChest) entity, is);
 
                     if (hasItem)
                     {
@@ -592,7 +592,7 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob> extends Abstr
         boolean hasItem;
         if (building != null)
         {
-            hasItem = isInTileEntity(building.getTileEntity(), is);
+            hasItem = checkIfInTileEntityAndRetrieve(building.getTileEntity(), is);
 
             if (hasItem)
             {
@@ -604,7 +604,7 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob> extends Abstr
                 final TileEntity entity = world.getTileEntity(pos);
                 if (entity instanceof TileEntityChest)
                 {
-                    hasItem = isInTileEntity(entity, is);
+                    hasItem = checkIfInTileEntityAndRetrieve(entity, is);
 
                     if (hasItem)
                     {
@@ -638,7 +638,7 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob> extends Abstr
      * @param is     the itemStack.
      * @return true if found the stack.
      */
-    public boolean isInTileEntity(final TileEntity entity, final ItemStack is)
+    public boolean checkIfInTileEntityAndRetrieve(final TileEntity entity, final ItemStack is)
     {
         return is != null
                  && InventoryFunctions
@@ -695,7 +695,7 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob> extends Abstr
      * @param itemStackSelectionPredicate the criteria.
      * @return true if found the stack.
      */
-    public boolean isInTileEntity(final TileEntityChest entity, @NotNull final Predicate<ItemStack> itemStackSelectionPredicate)
+    public boolean checkIfInTileEntityAndRetrieve(final TileEntityChest entity, @NotNull final Predicate<ItemStack> itemStackSelectionPredicate)
     {
         return InventoryFunctions
                  .matchFirstInProviderWithAction(
