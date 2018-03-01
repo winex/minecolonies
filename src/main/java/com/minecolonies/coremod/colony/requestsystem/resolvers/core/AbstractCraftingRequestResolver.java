@@ -10,12 +10,15 @@ import com.minecolonies.api.colony.requestsystem.requestable.Stack;
 import com.minecolonies.api.colony.requestsystem.requester.IRequester;
 import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.api.crafting.IRecipeStorage;
+import com.minecolonies.api.util.InventoryUtils;
 import com.minecolonies.api.util.ItemStackUtils;
 import com.minecolonies.blockout.Log;
 import com.minecolonies.coremod.colony.buildings.AbstractBuilding;
 import com.minecolonies.coremod.colony.buildings.AbstractBuildingWorker;
 import com.minecolonies.coremod.colony.requestsystem.requesters.IBuildingBasedRequester;
+import com.minecolonies.coremod.inventory.InventoryCitizen;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -197,6 +200,8 @@ public abstract class AbstractCraftingRequestResolver extends AbstractRequestRes
         final int craftingCount = calculateMaxCraftingCount(requestStack, storage);
         return storage.getCleanedInput().stream()
                  .filter(s -> !ItemStackUtils.isEmpty(s.getItemStack()))
+                 .filter(s -> InventoryUtils.getItemCountInItemHandler(new InvWrapper(building.getMainWorker().getInventory()),
+                         stack -> !ItemStackUtils.isEmpty(stack) && s.getItemStack().isItemEqual(stack)) < s.getAmount())
                  .map(stack -> {
                      final ItemStack craftingHelperStack = stack.getItemStack().copy();
                      ItemStackUtils.setSize(craftingHelperStack, stack.getAmount() * craftingCount);

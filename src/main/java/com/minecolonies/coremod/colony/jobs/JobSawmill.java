@@ -1,34 +1,16 @@
 package com.minecolonies.coremod.colony.jobs;
 
-import com.minecolonies.api.colony.requestsystem.StandardFactoryController;
-import com.minecolonies.api.colony.requestsystem.data.job.IRequestSystemCraftingJobDataStore;
-import com.minecolonies.api.colony.requestsystem.request.RequestState;
-import com.minecolonies.api.colony.requestsystem.token.IToken;
-import com.minecolonies.api.crafting.IRecipeStorage;
-import com.minecolonies.api.util.constant.NbtTagConstants;
-import com.minecolonies.api.util.constant.TypeConstants;
 import com.minecolonies.coremod.client.render.RenderBipedCitizen;
 import com.minecolonies.coremod.colony.CitizenData;
 import com.minecolonies.coremod.entity.ai.basic.AbstractAISkeleton;
 import com.minecolonies.coremod.entity.ai.citizen.sawmill.deliveryman.EntityAIWorkSawmill;
-import com.minecolonies.coremod.sounds.DeliverymanSounds;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.SoundEvent;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Class of the deliveryman job.
  */
-public class JobSawmill extends AbstractJob<IRequestSystemCraftingJobDataStore>
+public class JobSawmill extends AbstractJobCrafter
 {
-    private IToken<?> currentRequestToken;
-    private IRecipeStorage currentRecipeStorage;
-
     /**
      * Instantiates the job for the deliveryman.
      *
@@ -36,14 +18,14 @@ public class JobSawmill extends AbstractJob<IRequestSystemCraftingJobDataStore>
      */
     public JobSawmill(final CitizenData entity)
     {
-        super(entity, TypeConstants.REQUEST_SYSTEM_CRAFTING_JOB_DATA_STORE);
+        super(entity);
     }
 
     @NotNull
     @Override
     public String getName()
     {
-        return "com.minecolonies.coremod.job.Deliveryman";
+        return "com.minecolonies.coremod.job.Sawmill";
     }
 
     @NotNull
@@ -63,98 +45,5 @@ public class JobSawmill extends AbstractJob<IRequestSystemCraftingJobDataStore>
     public AbstractAISkeleton<JobSawmill> generateAI()
     {
         return new EntityAIWorkSawmill(this);
-    }
-
-    @Override
-    public SoundEvent getBedTimeSound()
-    {
-        if (getCitizen() != null)
-        {
-            return getCitizen().isFemale() ? DeliverymanSounds.Female.offToBed : null;
-        }
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public SoundEvent getBadWeatherSound()
-    {
-        if (getCitizen() != null)
-        {
-            return getCitizen().isFemale() ? DeliverymanSounds.Female.badWeather : null;
-        }
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public SoundEvent getMoveAwaySound()
-    {
-        if (getCitizen() != null)
-        {
-            return getCitizen().isFemale() ? DeliverymanSounds.Female.hostile : null;
-        }
-        return null;
-    }
-
-    public Map<IToken<?>, List<IRecipeStorage>> getOpenTasks()
-    {
-        return getDataStore().getOpenRequests();
-    }
-
-    public void addTask(@NotNull final IToken<?> token, @NotNull final IRecipeStorage recipeStorage)
-    {
-        getOpenTasks().putIfAbsent(token, new ArrayList<>());
-        getOpenTasks().get(token).add(recipeStorage);
-    }
-
-    public void finishTask(@NotNull final IToken<?> token, @NotNull final IRecipeStorage recipeStorage)
-    {
-        if (!getOpenTasks().containsKey(token))
-        {
-            return;
-        }
-
-        if (getOpenTasks().get(token).isEmpty())
-        {
-            getOpenTasks().remove(token);
-            return;
-        }
-
-        getOpenTasks().get(token).remove(recipeStorage);
-        if (getOpenTasks().get(token).isEmpty())
-        {
-            getOpenTasks().remove(token);
-
-            getColony().getRequestManager().updateRequestState(token, RequestState.POST_PROCESSING);
-            setCurrentRequestToken(null);
-        }
-
-        setCurrentRecipeStorage(null);
-    }
-
-    public void onTaskDeletion(@NotNull final IToken<?> token)
-    {
-        getOpenTasks().remove(token);
-    }
-
-    public IToken<?> getCurrentRequestToken()
-    {
-        return currentRequestToken;
-    }
-
-    public void setCurrentRequestToken(final IToken<?> currentRequestToken)
-    {
-        this.currentRequestToken = currentRequestToken;
-    }
-
-    public IRecipeStorage getCurrentRecipeStorage()
-    {
-        return currentRecipeStorage;
-    }
-
-    public void setCurrentRecipeStorage(final IRecipeStorage currentRecipeStorage)
-    {
-        this.currentRecipeStorage = currentRecipeStorage;
     }
 }

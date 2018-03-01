@@ -62,6 +62,8 @@ public final class NbtTagConstants
     public static final String TAG_STATUS                = "status";
     public static final String TAG_LAST_JOB              = "lastJob";
     public static final String TAG_DAY                   = "day";
+    public static final String OWNED_CHUNKS_TO_LOAD_TAG  = "ownedChunks";
+    public static final String CLOSE_CHUNKS_TO_LOAD_TAG  = "closeChunks";
 
     /**
      * Tag used to store the containers to NBT.
@@ -199,12 +201,17 @@ public final class NbtTagConstants
     public static final String TAG_CITIZEN_BY_OPEN_REQUEST = "CitizenByOpenRequest";
 
     public static final String TAG_RS_JOB_ASYNC = "AsyncRequestToken";
+    /**
+     * Missing chunks to be loaded.
+     */
+    public static final String TAG_MISSING_CHUNKS = "missingChunks";
 
     public static final String TAG_RS_JOB_DMAN_TASKS = "DManTasks";
 
     public static final String TAG_RS_JOB_DMAN_RETURNING = "Returning";
 
     public static final String TAG_RS_JOB_CRAFTER_TASKS = "CrafterTasks";
+
 
     /**
      * Private constructor to hide the implicit one.

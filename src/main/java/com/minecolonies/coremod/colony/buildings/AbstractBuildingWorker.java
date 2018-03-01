@@ -19,7 +19,6 @@ import com.minecolonies.coremod.colony.ColonyView;
 import com.minecolonies.coremod.colony.jobs.AbstractJob;
 import com.minecolonies.coremod.colony.requestsystem.resolvers.BuildingRequestResolver;
 import com.minecolonies.coremod.colony.requestsystem.resolvers.PrivateWorkerCraftingRequestResolver;
-import com.minecolonies.coremod.colony.requestsystem.resolvers.PublicWorkerCraftingRequestResolver;
 import com.minecolonies.coremod.entity.EntityCitizen;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemFood;
@@ -228,12 +227,12 @@ public abstract class AbstractBuildingWorker extends AbstractBuildingHut
      * This is only important for 3x3 crafting.
      * Workers shall override this if necessary.
      * @return true if so.
+     * @param ignored the token of the recipe.
      */
-    public boolean canRecipeBeAdded()
+    public boolean canRecipeBeAdded(final IToken ignored)
     {
-        return true;
+        return AbstractBuildingWorker.canBuildingCanLearnMoreRecipes (getBuildingLevel(), getRecipes().size());
     }
-
 
     /**
      * Get all handlers accociated with this building.
@@ -423,13 +422,15 @@ public abstract class AbstractBuildingWorker extends AbstractBuildingHut
      * Add a recipe to the building.
      * @param token the id of the recipe.
      */
-    public void addRecipe(final IToken token)
+    public boolean addRecipe(final IToken token)
     {
-        if(canRecipeBeAdded() && Math.pow(2, getBuildingLevel()) >= (recipes.size() + 1))
+        if(canRecipeBeAdded(token))
         {
             recipes.add(token);
             markDirty();
+            return true;
         }
+        return false;
     }
 
     /**
@@ -552,6 +553,15 @@ public abstract class AbstractBuildingWorker extends AbstractBuildingHut
             return TOOL_LEVEL_WOOD_OR_GOLD;
         }
         return getBuildingLevel() - WOOD_HUT_LEVEL;
+    }
+
+    /**
+     * Get the list of all recipes the worker can learn.
+     * @return a copy of the tokens of the recipes.
+     */
+    public List<IToken> getRecipes()
+    {
+        return new ArrayList<>(recipes);
     }
 
     /**
@@ -747,5 +757,25 @@ public abstract class AbstractBuildingWorker extends AbstractBuildingHut
         {
             return this.canCraftComplexRecipes;
         }
+
+        /**
+         * Check if an additional recipe can be added.
+         * @return true if so.
+         */
+        public boolean canRecipeBeAdded()
+        {
+            return AbstractBuildingWorker.canBuildingCanLearnMoreRecipes (getBuildingLevel(), getRecipes().size());
+        }
+    }
+
+    /**
+     * Check if an additional recipe can be added.
+     * @param learnedRecipes the learned recipes.
+     * @param buildingLevel the building level.
+     * @return true if so.
+     */
+    public static boolean canBuildingCanLearnMoreRecipes(final int buildingLevel, final int learnedRecipes)
+    {
+        return Math.pow(2, buildingLevel) >= (learnedRecipes + 1);
     }
 }

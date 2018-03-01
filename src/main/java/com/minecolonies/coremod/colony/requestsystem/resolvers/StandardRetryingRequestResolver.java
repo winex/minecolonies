@@ -162,7 +162,8 @@ public class StandardRetryingRequestResolver implements IRetryingRequestResolver
 
         //Lets get all keys with 0 residual delay:
         final Set<IToken<?>> retryables = delays.keySet().stream().filter(t -> delays.get(t) == 0).collect(Collectors.toSet());
-        final Set<IToken<?>> successfully = retryables.stream().filter(t -> {
+        final Set<IToken<?>> successfully = retryables.stream().filter(t ->
+        {
             final Set<IToken<?>> blackList = assignedRequests.get(t) < getMaximalTries() ? ImmutableSet.of() : ImmutableSet.of(id);
 
             Integer currentAttempt = assignedRequests.get(t);
@@ -174,7 +175,7 @@ public class StandardRetryingRequestResolver implements IRetryingRequestResolver
             {
                 resultingResolver = manager.reassignRequest(t, blackList);
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 assignedRequests.remove(t);
                 delays.remove(t);
@@ -194,9 +195,7 @@ public class StandardRetryingRequestResolver implements IRetryingRequestResolver
             return resultingResolver != null;
         }).collect(Collectors.toSet());
 
-        successfully.forEach(t -> {
-            LogHandler.log("Failed to reassign a retryable request: " + id);
-        });
+        successfully.forEach(t -> LogHandler.log("Failed to reassign a retryable request: " + id));
 
         LogHandler.log("Finished reassignment.");
     }

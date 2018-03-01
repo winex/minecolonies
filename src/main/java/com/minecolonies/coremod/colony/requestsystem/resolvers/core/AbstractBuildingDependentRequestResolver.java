@@ -52,9 +52,9 @@ public abstract class AbstractBuildingDependentRequestResolver<R extends IReques
     public Optional<IRequester> getBuilding(@NotNull final IRequestManager manager, @NotNull final IToken<?> token)
     {
         final IRequest request = manager.getRequestForToken(token);
-        if (request.getRequester() instanceof BuildingBasedRequester)
+        if (request.getRequester() instanceof IBuildingBasedRequester)
         {
-            final BuildingBasedRequester requester = (BuildingBasedRequester) request.getRequester();
+            final IBuildingBasedRequester requester = (IBuildingBasedRequester) request.getRequester();
             final ILocation requesterLocation = requester.getRequesterLocation();
             if (requesterLocation.equals(getRequesterLocation()))
             {

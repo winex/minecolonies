@@ -14,8 +14,7 @@ import com.minecolonies.coremod.MineColonies;
 import com.minecolonies.coremod.colony.CitizenData;
 import com.minecolonies.coremod.colony.Colony;
 import com.minecolonies.coremod.colony.buildings.AbstractBuildingWorker;
-import com.minecolonies.coremod.colony.jobs.JobDeliveryman;
-import com.minecolonies.coremod.colony.jobs.JobSawmill;
+import com.minecolonies.coremod.colony.jobs.AbstractJobCrafter;
 import com.minecolonies.coremod.colony.requestsystem.resolvers.core.AbstractCraftingRequestResolver;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -26,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
-import java.util.List;
 
 import static com.minecolonies.api.util.RSConstants.CONST_CRAFTING_RESOLVER_PRIORITY;
 
@@ -48,7 +46,7 @@ public class PublicWorkerCraftingRequestResolver extends AbstractCraftingRequest
 
     @Override
     protected boolean canRequestBeAssignedToWorker(
-      @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request, @NotNull final AbstractBuildingWorker currentBuilding)
+            @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request, @NotNull final AbstractBuildingWorker currentBuilding)
     {
         if (manager.getColony().getWorld().isRemote)
         {
@@ -57,12 +55,17 @@ public class PublicWorkerCraftingRequestResolver extends AbstractCraftingRequest
 
         final Colony colony = (Colony) manager.getColony();
         return colony.getCitizenManager().getCitizens()
-                                     .stream()
-                                     .anyMatch(citizenData -> citizenData.getJob() instanceof JobSawmill);
+                .stream()
+                .anyMatch(citizenData -> citizenData.getJob() instanceof AbstractJobCrafter);
     }
 
     @Override
-    protected void performCraftingForBuilding(@NotNull final AbstractBuildingWorker worker, @NotNull final IRequestManager manager, @NotNull final IToken<?> requestToken, @NotNull final IRecipeStorage recipeStorage, final int craftingCount)
+    protected void performCraftingForBuilding(
+            @NotNull final AbstractBuildingWorker worker,
+            @NotNull final IRequestManager manager,
+            @NotNull final IToken<?> requestToken,
+            @NotNull final IRecipeStorage recipeStorage,
+            final int craftingCount)
     {
         if (manager.getColony().getWorld().isRemote)
         {
@@ -73,35 +76,35 @@ public class PublicWorkerCraftingRequestResolver extends AbstractCraftingRequest
 
         final Colony colony = (Colony) manager.getColony();
         final CitizenData targetWorker = colony.getCitizenManager().getCitizens().stream()
-        .filter(citizenData -> citizenData.getJob() instanceof JobSawmill)
-        .filter(citizenData -> ((JobSawmill) citizenData.getJob()).getOpenTasks().containsKey(requestToken))
-        .findFirst()
-        .orElse(colony.getCitizenManager()
-                  .getCitizens()
-                  .stream()
-                  .filter(c -> c.getJob() instanceof JobSawmill)
-                  .min(Comparator.comparing((CitizenData c) -> ((JobSawmill) c.getJob()).getOpenTasks().size())
-                         .thenComparing(Comparator.comparing(c -> {
-                             BlockPos targetPos = request.getRequester().getRequesterLocation().getInDimensionLocation();
-                             //We can do an instant get here, since we are already filtering on anything that has no entity.
-                             BlockPos entityLocation = c.getCitizenEntity().get().getLocation().getInDimensionLocation();
+                .filter(citizenData -> citizenData.getJob() instanceof AbstractJobCrafter)
+                .filter(citizenData -> ((AbstractJobCrafter) citizenData.getJob()).getOpenTasks().containsKey(requestToken))
+                .findFirst()
+                .orElse(colony.getCitizenManager()
+                        .getCitizens()
+                        .stream()
+                        .filter(c -> c.getJob() instanceof AbstractJobCrafter)
+                        .min(Comparator.comparing((CitizenData c) -> ((AbstractJobCrafter) c.getJob()).getOpenTasks().size())
+                                .thenComparing(Comparator.comparing(c -> {
+                                    BlockPos targetPos = request.getRequester().getRequesterLocation().getInDimensionLocation();
+                                    //We can do an instant get here, since we are already filtering on anything that has no entity.
+                                    BlockPos entityLocation = c.getCitizenEntity().get().getLocation().getInDimensionLocation();
 
-                             return BlockPosUtil.getDistanceSquared(targetPos, entityLocation);
-                         })))
-                  .orElse(null));
+                                    return BlockPosUtil.getDistanceSquared(targetPos, entityLocation);
+                                })))
+                        .orElse(null));
 
         if (targetWorker != null)
         {
             for (int i = 0; i < craftingCount; i++)
             {
-                ((JobSawmill) targetWorker.getJob()).addTask(requestToken, recipeStorage);
+                ((AbstractJobCrafter) targetWorker.getJob()).addTask(requestToken, recipeStorage);
             }
         }
     }
 
     @Override
     protected void onCraftingCompleted(
-      @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request)
+            @NotNull final IRequestManager manager, @NotNull final IRequest<? extends Stack> request)
     {
         //Noop worker completes the chain.
     }
@@ -127,14 +130,14 @@ public class PublicWorkerCraftingRequestResolver extends AbstractCraftingRequest
         {
             final Colony colony = (Colony) manager.getColony();
             final CitizenData worker = colony.getCitizenManager().getCitizens()
-                                                  .stream()
-                                                  .filter(c -> c.getJob() instanceof JobSawmill && ((JobSawmill) c.getJob()).getOpenTasks().containsKey(request.getToken()))
-                                                  .findFirst()
-                                                  .orElse(null);
+                    .stream()
+                    .filter(c -> c.getJob() instanceof AbstractJobCrafter && ((AbstractJobCrafter) c.getJob()).getOpenTasks().containsKey(request.getToken()))
+                    .findFirst()
+                    .orElse(null);
 
             if ((worker != null))
             {
-                final JobSawmill job = (JobSawmill) worker.getJob();
+                final AbstractJobCrafter job = (AbstractJobCrafter) worker.getJob();
                 job.onTaskDeletion(request.getToken());
             }
         }
@@ -160,12 +163,11 @@ public class PublicWorkerCraftingRequestResolver extends AbstractCraftingRequest
         //Noop
     }
 
-
     @NotNull
     @Override
     public ITextComponent getDisplayName(@NotNull final IRequestManager manager, @NotNull final IToken<?> token)
     {
-        IRequest<?> request = manager.getRequestForToken(token);
+        final IRequest<?> request = manager.getRequestForToken(token);
 
         if (request == null)
         {

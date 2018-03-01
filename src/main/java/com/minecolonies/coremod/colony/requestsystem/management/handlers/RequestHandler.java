@@ -1,7 +1,6 @@
 package com.minecolonies.coremod.colony.requestsystem.management.handlers;
 
 import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 import com.minecolonies.api.colony.requestsystem.manager.AssigningStrategy;
 import com.minecolonies.api.colony.requestsystem.manager.RequestMappingHandler;
@@ -23,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.minecolonies.api.util.constant.Suppression.MAGIC_NUMBERS_SHOULD_NOT_BE_USED;
 import static com.minecolonies.api.util.constant.Suppression.RAWTYPES;
 import static com.minecolonies.api.util.constant.Suppression.UNCHECKED;
 
@@ -34,12 +32,12 @@ public final class RequestHandler
 {
 
     @SuppressWarnings(UNCHECKED)
-    public static <Request extends IRequestable> IRequest<Request> createRequest(final IStandardRequestManager manager, final IRequester requester, final Request request)
+    public static <R extends IRequestable> IRequest<R> createRequest(final IStandardRequestManager manager, final IRequester requester, final R request)
     {
         final IToken<UUID> token = TokenHandler.generateNewToken(manager);
 
-        final IRequest<Request> constructedRequest = manager.getFactoryController()
-                                                       .getNewInstance(TypeToken.of((Class<? extends IRequest<Request>>) RequestMappingHandler.getRequestableMappings()
+        final IRequest<R> constructedRequest = manager.getFactoryController()
+                                                       .getNewInstance(TypeToken.of((Class<? extends IRequest<R>>) RequestMappingHandler.getRequestableMappings()
                                                                                                                            .get(request.getClass())), request, token, requester);
 
         LogHandler.log("Creating request for: " + request + ", token: " + token + " and output: " + constructedRequest);
@@ -93,10 +91,8 @@ public final class RequestHandler
             case PRIORITY_BASED:
                 return assignRequestDefault(manager, request, resolverTokenBlackList);
             case FASTED_FIRST:
-            {
                 MineColonies.getLogger().warn("Fastest First strategy not implemented yet.");
                 return assignRequestDefault(manager, request, resolverTokenBlackList);
-            }
         }
 
         return null;
@@ -226,20 +222,18 @@ public final class RequestHandler
         //Cancel the request to restart the search
         processInternalCancellation(manager, request.getToken());
 
-        if (currentResolver != null)
+        if (currentResolver != null
+                && manager.getRequestResolverRequestAssignmentDataStore().getAssignments().containsKey(currentResolver.getRequesterId()))
         {
-            if (manager.getRequestResolverRequestAssignmentDataStore().getAssignments().containsKey(currentResolver.getRequesterId()))
+            manager.getRequestResolverRequestAssignmentDataStore().getAssignments().get(currentResolver.getRequesterId()).remove(request.getToken());
+            if (manager.getRequestResolverRequestAssignmentDataStore().getAssignments().get(currentResolver.getRequesterId()).isEmpty())
             {
-                manager.getRequestResolverRequestAssignmentDataStore().getAssignments().get(currentResolver.getRequesterId()).remove(request.getToken());
-                if (manager.getRequestResolverRequestAssignmentDataStore().getAssignments().get(currentResolver.getRequesterId()).isEmpty())
-                {
-                    manager.getRequestResolverRequestAssignmentDataStore().getAssignments().remove(currentResolver.getRequesterId());
-                }
+                manager.getRequestResolverRequestAssignmentDataStore().getAssignments().remove(currentResolver.getRequesterId());
             }
         }
 
         manager.updateRequestState(request.getToken(), RequestState.REPORTED);
-        IToken<?> resolver = assignRequest(manager, request, resolverTokenBlackList);
+        final IToken<?> resolver = assignRequest(manager, request, resolverTokenBlackList);
 
         if (parent != null)
         {

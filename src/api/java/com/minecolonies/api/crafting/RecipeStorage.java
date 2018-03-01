@@ -80,7 +80,7 @@ public class RecipeStorage implements IRecipeStorage
                 continue;
             }
 
-            ItemStorage storage = new ItemStorage(stack);
+            ItemStorage storage = new ItemStorage(stack.copy());
             if(items.contains(storage))
             {
                 final int index = items.indexOf(storage);
@@ -203,8 +203,10 @@ public class RecipeStorage implements IRecipeStorage
         final List<ItemStack> secondaryStacks = new ArrayList<>();
         for(final ItemStack stack: input)
         {
-            stack.getItem().getContainerItem(stack);
+            secondaryStacks.add(stack.getItem().getContainerItem(stack));
         }
+        secondaryStacks.add(getPrimaryOutput());
+
         if(secondaryStacks.size() > getInput().size())
         {
             int freeSpace = 0;
@@ -234,13 +236,13 @@ public class RecipeStorage implements IRecipeStorage
             return false;
         }
 
-        for (final ItemStack stack : input)
+        for (final ItemStorage stack : getCleanedInput())
         {
-            int amountNeeded = ItemStackUtils.getSize(stack);
+            int amountNeeded = stack.getAmount();
             for (final IItemHandler handler : handlers)
             {
                 final int slotOfStack = InventoryUtils.
-                        findFirstSlotInItemHandlerNotEmptyWith(handler, itemStack -> !ItemStackUtils.isEmpty(itemStack) && itemStack.isItemEqual(stack));
+                        findFirstSlotInItemHandlerNotEmptyWith(handler, itemStack -> !ItemStackUtils.isEmpty(itemStack) && itemStack.isItemEqual(stack.getItemStack()));
 
                 while (slotOfStack != -1)
                 {
