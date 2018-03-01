@@ -132,11 +132,7 @@ public class PublicWorkerCraftingRequestResolver extends AbstractCraftingRequest
                                                   .findFirst()
                                                   .orElse(null);
 
-            if (worker == null)
-            {
-                MineColonies.getLogger().error("Parent cancellation failed! Unknown request: " + request.getToken());
-            }
-            else
+            if ((worker != null))
             {
                 final JobSawmill job = (JobSawmill) worker.getJob();
                 job.onTaskDeletion(request.getToken());

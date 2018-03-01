@@ -415,7 +415,7 @@ public final class RequestHandler
         //Now lets get ourselfs a clean up.
         final IRequestResolver<?> targetResolver = ResolverHandler.getResolverForRequest(manager, request);
         final IToken<?> replacementRequestToken = targetResolver.onRequestCancelled(manager, request);
-        final IRequest<?> replacementRequest = getRequest(manager, replacementRequestToken);
+        final IRequest<?> replacementRequest = Objects.nonNull(replacementRequestToken) ? getRequest(manager, replacementRequestToken) : null;
 
         processParentReplacement(manager, request, replacementRequest);
 
