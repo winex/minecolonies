@@ -441,32 +441,7 @@ public abstract class AbstractRequest<R extends IRequestable> implements IReques
     @Override
     public List<ItemStack> getDisplayStacks()
     {
-        if (!(getRequest() instanceof IDeliverable))
-        {
-            return Lists.newArrayList();
-        }
-
-        final IDeliverable deliverable = (IDeliverable) getRequest();
-
-        if (itemExamples == null)
-        {
-            itemExamples =
-              ImmutableList.copyOf(StreamSupport.stream(Spliterators.spliteratorUnknownSize(Item.REGISTRY.iterator(), Spliterator.ORDERED), false).flatMap(item -> {
-                  final NonNullList<ItemStack> stacks = NonNullList.create();
-                  try
-                  {
-                      item.getSubItems(CreativeTabs.SEARCH, stacks);
-                  }
-                  catch (Exception ex)
-                  {
-                      Log.getLogger().warn("Failed to get sub items from: " + item.getRegistryName());
-                  }
-
-                  return stacks.stream().filter(deliverable::matches);
-              }).collect(Collectors.toList()));
-        }
-
-        return itemExamples;
+        return Lists.newArrayList();
     }
 
     @NotNull

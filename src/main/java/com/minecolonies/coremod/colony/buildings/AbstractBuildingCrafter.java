@@ -2,13 +2,17 @@ package com.minecolonies.coremod.colony.buildings;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.minecolonies.api.colony.requestsystem.resolver.IRequestResolver;
 import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.api.util.constant.TypeConstants;
 import com.minecolonies.coremod.colony.Colony;
 import com.minecolonies.coremod.colony.ColonyView;
+import com.minecolonies.coremod.colony.requestsystem.resolvers.PrivateWorkerCraftingRequestResolver;
 import com.minecolonies.coremod.colony.requestsystem.resolvers.PublicWorkerCraftingRequestResolver;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.List;
 
 /**
  * Class of the sawmill building.
@@ -37,7 +41,10 @@ public abstract class AbstractBuildingCrafter extends AbstractBuildingWorker
         final ImmutableCollection<IRequestResolver<?>> supers = super.getResolvers();
         final ImmutableList.Builder<IRequestResolver<?>> builder = ImmutableList.builder();
 
-        builder.addAll(supers);
+        final List<IRequestResolver<?>> mutableSupers = Lists.newArrayList(supers);
+        mutableSupers.removeIf(o -> o instanceof PrivateWorkerCraftingRequestResolver);
+
+        builder.addAll(mutableSupers);
         builder.add(new PublicWorkerCraftingRequestResolver(getRequester().getRequesterLocation(),
                                                  getColony().getRequestManager().getFactoryController().getNewInstance(TypeConstants.ITOKEN)));
 

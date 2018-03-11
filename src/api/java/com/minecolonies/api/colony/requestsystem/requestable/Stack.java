@@ -142,7 +142,7 @@ public class Stack implements IDeliverable, Predicate<ItemStack>
             return OreDictionary.itemMatches(getStack(), stack, matchMeta) && getCount() <= stack.getCount();
         }
 
-        return ItemStackUtils.compareItemStacksIgnoreStackSize(getStack(), stack, matchMeta, matchNBT);
+        return ItemStackUtils.compareItemStacksIgnoreStackSize(getStack(), stack, matchMeta, matchNBT) && getCount() <= stack.getCount();
     }
 
     @Override

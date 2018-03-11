@@ -70,6 +70,12 @@ public final class StandardRequests
             combined.getStyle().setColor(TextFormatting.BLACK);
             return combined;
         }
+
+        @Override
+        public List<ItemStack> getDisplayStacks()
+        {
+            return ImmutableList.of(getRequest().getStack());
+        }
     }
 
     public static class DeliveryRequest extends AbstractRequest<Delivery>
