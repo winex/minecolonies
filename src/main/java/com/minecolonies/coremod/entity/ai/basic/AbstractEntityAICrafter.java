@@ -46,9 +46,9 @@ public abstract class AbstractEntityAICrafter<J extends AbstractJobCrafter> exte
     protected BlockPos walkTo = null;
 
     /**
-     * Initialize the sawmill and add all his tasks.
+     * Initialize the crafter and add all his tasks.
      *
-     * @param sawmill the job he has.
+     * @param crafter the job he has.
      */
     public AbstractEntityAICrafter(@NotNull final AbstractJobCrafter crafter)
     {
