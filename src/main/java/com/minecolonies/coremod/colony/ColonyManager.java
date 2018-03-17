@@ -795,14 +795,17 @@ public final class ColonyManager
      */
     public static void onServerTick(@NotNull final TickEvent.ServerTickEvent event)
     {
-        for (@NotNull final Colony c : colonies)
+        if (event.phase == TickEvent.Phase.END)
         {
-            c.onServerTick(event);
-        }
+            for (@NotNull final Colony c : colonies)
+            {
+                c.onServerTick(event);
+            }
 
-        if (saveNeeded)
-        {
-            saveColonies();
+            if (saveNeeded)
+            {
+                saveColonies();
+            }
         }
     }
 
@@ -843,8 +846,6 @@ public final class ColonyManager
         compound.setTag(TAG_COMPATABILITY_MANAGER, compCompound);
 
         compound.setBoolean(TAG_DISTANCE, true);
-        compound.setInteger(TAG_NEW_COLONIES, colonies.getSize());
-
         final NBTTagCompound recipeCompound = new NBTTagCompound();
         recipeManager.writeToNBT(recipeCompound);
         compound.setTag(RECIPE_MANAGER_TAG, recipeCompound);
@@ -909,7 +910,10 @@ public final class ColonyManager
      */
     public static void onWorldTick(@NotNull final TickEvent.WorldTickEvent event)
     {
-        getColonies(event.world).forEach(c -> c.onWorldTick(event));
+        if (event.phase == TickEvent.Phase.END)
+        {
+            getColonies(event.world).forEach(c -> c.onWorldTick(event));
+        }
     }
 
     /**
@@ -993,7 +997,7 @@ public final class ColonyManager
             @NotNull final File saveDir = new File(DimensionManager.getWorld(0).getSaveHandler().getWorldDirectory(), FILENAME_MINECOLONIES_PATH);
             final ZipOutputStream zos = new ZipOutputStream(fos);
 
-            for (int i = 1; i < colonies.getTopID(); i++)
+            for (int i = 1; i < colonies.getTopID() + 1; i++)
             {
                 @NotNull final File file = new File(saveDir, String.format(FILENAME_COLONY, i));
                 if (file.exists())
@@ -1181,7 +1185,6 @@ public final class ColonyManager
             view = ColonyView.createFromNetwork(colonyId);
             colonyViews.add(view);
         }
-
         return view.handleColonyViewMessage(colonyData, world, isNewSubscription);
     }
 
@@ -1385,7 +1388,7 @@ public final class ColonyManager
     public static boolean isCoordinateInAnyColony(@NotNull final World world, final BlockPos pos)
     {
         final Chunk centralChunk = world.getChunkFromBlockCoords(pos);
-        return centralChunk.getCapability(CLOSE_COLONY_CAP, null).getOwningColony() == 0;
+        return centralChunk.getCapability(CLOSE_COLONY_CAP, null).getOwningColony() != 0;
     }
 
     /**
