@@ -188,7 +188,7 @@ public abstract class AbstractEntityAIHerder<J extends AbstractJob, T extends En
         {
             checkIfRequestForItemExistOrCreateAsynch(item);
         }
-
+        setDelay(DECIDING_DELAY);
         return HERDER_DECIDE;
     }
 
@@ -226,7 +226,8 @@ public abstract class AbstractEntityAIHerder<J extends AbstractJob, T extends En
 
         if (animal != null && !animal.isEntityAlive())
         {
-            incrementActionsDone();
+            worker.addExperience(1.0);
+            incrementActionsDoneAndDecSaturation();
         }
 
         return HERDER_BUTCHER;
@@ -275,7 +276,8 @@ public abstract class AbstractEntityAIHerder<J extends AbstractJob, T extends En
         worker.setLatestStatus(new TextComponentTranslation(TranslationConstants.COM_MINECOLONIES_COREMOD_STATUS_HERDER_BREEDING));
 
         breedTwoAnimals(animalOne, animalTwo);
-
+        incrementActionsDoneAndDecSaturation();
+        worker.addExperience(1.0);
         return HERDER_DECIDE;
     }
 
@@ -295,7 +297,7 @@ public abstract class AbstractEntityAIHerder<J extends AbstractJob, T extends En
             walkToBlock(item.getPosition());
         }
 
-        incrementActionsDone();
+        incrementActionsDoneAndDecSaturation();
 
         return HERDER_DECIDE;
     }

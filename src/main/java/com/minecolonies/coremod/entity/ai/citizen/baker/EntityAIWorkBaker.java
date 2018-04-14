@@ -160,7 +160,7 @@ public class EntityAIWorkBaker extends AbstractEntityAISkill<JobBaker>
                 }
             }
             worker.addExperience(XP_PER_PRODUCT);
-            incrementActionsDone();
+            incrementActionsDoneAndDecSaturation();
             progress = 0;
             currentBakingProduct = null;
             return PREPARING;

@@ -9,15 +9,15 @@ import com.minecolonies.api.colony.requestsystem.requester.IRequester;
 import com.minecolonies.api.configuration.Configurations;
 import com.minecolonies.api.util.BlockPosUtil;
 import com.minecolonies.api.util.LanguageHandler;
-import com.minecolonies.api.util.MathUtils;
 import com.minecolonies.api.util.constant.Suppression;
 import com.minecolonies.coremod.MineColonies;
 import com.minecolonies.coremod.colony.buildings.AbstractBuilding;
 import com.minecolonies.coremod.colony.managers.*;
 import com.minecolonies.coremod.colony.permissions.Permissions;
 import com.minecolonies.coremod.colony.requestsystem.management.manager.StandardRequestManager;
+import com.minecolonies.coremod.colony.workorders.WorkManager;
 import com.minecolonies.coremod.entity.ai.mobs.util.MobEventsUtils;
-import com.minecolonies.coremod.network.messages.*;
+import com.minecolonies.coremod.network.messages.ColonyViewRemoveWorkOrderMessage;
 import com.minecolonies.coremod.permissions.ColonyPermissionEventHandler;
 import com.minecolonies.coremod.util.ServerUtils;
 import net.minecraft.block.Block;
@@ -160,6 +160,11 @@ public class Colony implements IColony
     private BlockPos center;
 
     /**
+     * Th
+     */
+    private int nightsSinceLastRaid = 0;
+
+    /**
      * The colony permission object.
      */
     @NotNull
@@ -259,8 +264,6 @@ public class Colony implements IColony
         c.readFromNBT(compound);
         return c;
     }
-
-
 
     /**
      * Sets the request manager on colony load.
@@ -644,6 +647,7 @@ public class Colony implements IColony
         if (isDay && !world.isDaytime())
         {
             isDay = false;
+            nightsSinceLastRaid++;
             citizenManager.checkCitizensForHappiness();
         }
         else if (!isDay && world.isDaytime())
@@ -943,10 +947,13 @@ public class Colony implements IColony
      * @param building The upgraded building.
      * @param level    The new level.
      */
-    public void onBuildingUpgradeComplete(@NotNull final AbstractBuilding building, final int level)
+    public void onBuildingUpgradeComplete(@Nullable final AbstractBuilding building, final int level)
     {
-        building.onUpgradeComplete(level);
-        this.markDirty();
+        if (building != null)
+        {
+            building.onUpgradeComplete(level);
+            this.markDirty();
+        }
     }
 
     /**
@@ -1134,5 +1141,23 @@ public class Colony implements IColony
             this.writeToNBT(new NBTTagCompound());
         }
         return this.colonyTag;
+    }
+
+    /**
+     * Getter for the nights since the last raid.
+     * @return the number of nights.
+     */
+    public int getNightsSinceLastRaid()
+    {
+        return nightsSinceLastRaid;
+    }
+
+    /**
+     * Setter for the nights since the last raid.
+     * @param nights the number of nights.
+     */
+    public void setNightsSinceLastRaid(final int nights)
+    {
+        this.nightsSinceLastRaid = nights;
     }
 }

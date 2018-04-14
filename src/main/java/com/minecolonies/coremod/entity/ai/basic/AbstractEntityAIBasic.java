@@ -45,7 +45,8 @@ import java.util.function.Predicate;
 import static com.minecolonies.api.util.constant.CitizenConstants.HIGH_SATURATION;
 import static com.minecolonies.api.util.constant.Suppression.RAWTYPES;
 import static com.minecolonies.api.util.constant.ToolLevelConstants.TOOL_LEVEL_WOOD_OR_GOLD;
-import static com.minecolonies.api.util.constant.TranslationConstants.*;
+import static com.minecolonies.api.util.constant.TranslationConstants.BUILDING_LEVEL_TOO_LOW;
+import static com.minecolonies.api.util.constant.TranslationConstants.COM_MINECOLONIES_COREMOD_ENTITY_WORKER_INVENTORYFULLCHEST;
 import static com.minecolonies.coremod.colony.buildings.AbstractBuilding.MAX_PRIO;
 import static com.minecolonies.coremod.entity.ai.util.AIState.*;
 
@@ -214,6 +215,17 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob> extends Abstr
     public AbstractBuildingWorker getOwnBuilding()
     {
         return worker.getWorkBuilding();
+    }
+
+    /**
+     * Can be overridden in implementations to return the exact building type.
+     *
+     * @return the building associated with this AI's worker.
+     */
+    @Nullable
+    public <W extends AbstractBuildingWorker> W getOwnBuilding(@NotNull final Class<W> type)
+    {
+        return (W) worker.getWorkBuilding();
     }
 
     @Override
@@ -1047,6 +1059,23 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob> extends Abstr
         }
         hasDelayed = false;
         return false;
+    }
+
+    /**
+     * Tell the ai that you have done one more action.
+     * <p>
+     * if the actions exceed a certain number,
+     * the ai will dump it's inventory.
+     * this also triggers the AI to get hungry.
+     * <p>
+     * For example:
+     * <p>
+     * After x blocks, bring everything back.
+     */
+    protected final void incrementActionsDoneAndDecSaturation()
+    {
+        worker.decreaseSaturationForAction();
+        actionsDone++;
     }
 
     /**

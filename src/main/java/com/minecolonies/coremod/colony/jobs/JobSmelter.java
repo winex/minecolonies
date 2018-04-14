@@ -4,7 +4,6 @@ import com.minecolonies.api.util.constant.TypeConstants;
 import com.minecolonies.coremod.client.render.RenderBipedCitizen;
 import com.minecolonies.coremod.colony.CitizenData;
 import com.minecolonies.coremod.entity.ai.basic.AbstractAISkeleton;
-import com.minecolonies.coremod.entity.ai.citizen.cook.EntityAIWorkCook;
 import com.minecolonies.coremod.entity.ai.citizen.smelter.EntityAIWorkSmelter;
 import org.jetbrains.annotations.NotNull;
 

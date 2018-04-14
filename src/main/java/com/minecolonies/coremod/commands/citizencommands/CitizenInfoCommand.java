@@ -38,6 +38,14 @@ public class CitizenInfoCommand extends AbstractCitizensCommands
     private static final String CITIZEN_NOT_LOADED         = "Citizen entity not loaded!";
 
     /**
+     * no-args constructor called by new CommandEntryPoint executer.
+     */
+    public CitizenInfoCommand()
+    {
+        super();
+    }
+
+    /**
      * Initialize this SubCommand with it's parents.
      *
      * @param parents an array of all the parents.

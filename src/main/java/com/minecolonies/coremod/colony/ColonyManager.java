@@ -8,8 +8,11 @@ import com.minecolonies.api.colony.permissions.Rank;
 import com.minecolonies.api.compatibility.CompatabilityManager;
 import com.minecolonies.api.compatibility.ICompatabilityManager;
 import com.minecolonies.api.configuration.Configurations;
-import com.minecolonies.api.util.*;
 import com.minecolonies.api.crafting.IRecipeManager;
+import com.minecolonies.api.util.ChunkLoadStorage;
+import com.minecolonies.api.util.LanguageHandler;
+import com.minecolonies.api.util.Log;
+import com.minecolonies.api.util.Utils;
 import com.minecolonies.coremod.MineColonies;
 import com.minecolonies.coremod.achievements.ModAchievements;
 import com.minecolonies.coremod.blocks.AbstractBlockHut;
@@ -38,16 +41,20 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static com.minecolonies.api.util.constant.Constants.*;
-import static com.minecolonies.api.util.constant.NbtTagConstants.*;
-import static com.minecolonies.coremod.MineColonies.CLOSE_COLONY_CAP;
+import static com.minecolonies.api.util.constant.Constants.BLOCKS_PER_CHUNK;
+import static com.minecolonies.api.util.constant.Constants.HALF_A_CIRCLE;
 import static com.minecolonies.api.util.constant.NbtTagConstants.TAG_COMPATABILITY_MANAGER;
+import static com.minecolonies.api.util.constant.NbtTagConstants.TAG_MISSING_CHUNKS;
+import static com.minecolonies.coremod.MineColonies.CLOSE_COLONY_CAP;
 
 /**
  * Singleton class that links colonies to minecraft.
@@ -199,7 +206,7 @@ public final class ColonyManager
         colony.getStatsManager().triggerAchievement(ModAchievements.achievementTownhall);
         Log.getLogger().info(String.format("New Colony Id: %d by %s", colony.getID(), player.getName()));
 
-        ColonyManager.notifyChunksInRange(colony.getWorld(), true, colony.getID(), colony.getCenter(), colony.getDimension());
+        ColonyManager.claimColonyChunks(colony.getWorld(), true, colony.getID(), colony.getCenter(), colony.getDimension());
         ColonyManager.markDirty();
         return colony;
     }
@@ -209,7 +216,7 @@ public final class ColonyManager
      * @param world the world of the colony.
      * @param add remove or add
      */
-    public static void notifyChunksInRange(final World world, final boolean add, final int id, final BlockPos center, final int dimension)
+    public static void claimColonyChunks(final World world, final boolean add, final int id, final BlockPos center, final int dimension)
     {
         final Chunk centralChunk = world.getChunkFromBlockCoords(center);
         if(centralChunk.getCapability(CLOSE_COLONY_CAP, null).getOwningColony() == id && add)
@@ -236,16 +243,32 @@ public final class ColonyManager
         final int range = Configurations.gameplay.workingRangeTownHallChunks;
         final int buffer = Configurations.gameplay.townHallPaddingChunk;
 
-        final int maxRange = range * 2 + buffer;
+
+        claimChunksInRange(id, dimension, add, chunkX, chunkZ, range, buffer);
+    }
+
+    /**
+     * Claim a number of chunks in a certain range around a position.
+     * @param colonyId the colony id.
+     * @param dimension the dimension.
+     * @param add if claim or unclaim.
+     * @param chunkX the chunkX starter position.
+     * @param chunkZ the chunkZ starter position.
+     * @param range the range.
+     * @param buffer the buffer.
+     */
+    public static void claimChunksInRange(final int colonyId, final int dimension, final boolean add, final int chunkX, final int chunkZ, final int range, final int buffer)
+    {
         @NotNull final File chunkDir = new File(DimensionManager.getWorld(0).getSaveHandler().getWorldDirectory(), CHUNK_INFO_PATH);
         Utils.checkDirectory(chunkDir);
+        final int maxRange = range * 2 + buffer;
 
         for(int i = chunkX - maxRange; i <= chunkX + maxRange; i++)
         {
             for (int j = chunkZ - maxRange; j <= chunkZ + maxRange; j++)
             {
                 final boolean owning = i >= chunkX - range && j >= chunkZ - range && i <= chunkX + range && j <= chunkZ + range;
-                @NotNull final ChunkLoadStorage newStorage = new ChunkLoadStorage(id, ChunkPos.asLong(i, j), add, dimension, owning);
+                @NotNull final ChunkLoadStorage newStorage = new ChunkLoadStorage(colonyId, ChunkPos.asLong(i, j), add, dimension, owning);
                 @NotNull final File file = new File(chunkDir, String.format(FILENAME_CHUNK, i, j, dimension));
                 if (file.exists())
                 {
@@ -258,7 +281,7 @@ public final class ColonyManager
                     }
                     else
                     {
-                        saveNBTToPath(file, newStorage.toNBT());
+                        saveNBTToPath(file, storage.toNBT());
                         missingChunksToLoad++;
                     }
                 }
@@ -280,7 +303,6 @@ public final class ColonyManager
     {
         final IColonyTagCapability cap = chunk.getCapability(CLOSE_COLONY_CAP, null);
         storage.applyToCap(cap);
-        Log.getLogger().warn("Loading Chunk: " + chunk.x + " " + chunk.z);
         chunk.markDirty();
         MineColonies.getNetwork().sendToAll(new UpdateChunkCapabilityMessage(cap, chunk.x, chunk.z));
     }
@@ -333,7 +355,7 @@ public final class ColonyManager
         try
         {
             final Colony colony = getColony(id);
-            ColonyManager.notifyChunksInRange(colony.getWorld(), false, id, colony.getCenter(), colony.getDimension());
+            ColonyManager.claimColonyChunks(colony.getWorld(), false, id, colony.getCenter(), colony.getDimension());
             final Set<World> colonyWorlds = new HashSet<>();
             Log.getLogger().info("Removing citizens for " + id);
             for (final CitizenData citizenData : new ArrayList<>(colony.getCitizenManager().getCitizens()))
@@ -804,7 +826,7 @@ public final class ColonyManager
 
             if (saveNeeded)
             {
-                saveColonies();
+                saveColonies(false);
             }
         }
     }
@@ -812,7 +834,7 @@ public final class ColonyManager
     /**
      * Save all the Colonies.
      */
-    private static void saveColonies()
+    private static void saveColonies(final boolean isWorldUnload)
     {
         @NotNull final NBTTagCompound compound = new NBTTagCompound();
         writeToNBT(compound);
@@ -820,11 +842,19 @@ public final class ColonyManager
         @NotNull final File file = getSaveLocation();
         saveNBTToPath(file, compound);
         @NotNull final File saveDir = new File(DimensionManager.getWorld(0).getSaveHandler().getWorldDirectory(), FILENAME_MINECOLONIES_PATH);
-        for(final Colony colony: colonies)
+        for (final Colony colony : colonies)
         {
-            saveNBTToPath(new File(saveDir, String.format(FILENAME_COLONY, colony.getID())), colony.getColonyTag());
+            if (isWorldUnload)
+            {
+                final NBTTagCompound colonyCompound = new NBTTagCompound();
+                colony.writeToNBT(colonyCompound);
+                saveNBTToPath(new File(saveDir, String.format(FILENAME_COLONY, colony.getID())), colonyCompound);
+            }
+            else
+            {
+                saveNBTToPath(new File(saveDir, String.format(FILENAME_COLONY, colony.getID())), colony.getColonyTag());
+            }
         }
-
         saveNeeded = false;
     }
 
@@ -955,7 +985,7 @@ public final class ColonyManager
                             {
                                 @NotNull final Colony colony = Colony.loadColony(colonyData, world);
                                 colonies.add(colony);
-                                ColonyManager.notifyChunksInRange(colony.getWorld(), true, colony.getID(), colony.getCenter(), colony.getDimension());
+                                ColonyManager.claimColonyChunks(colony.getWorld(), true, colony.getID(), colony.getCenter(), colony.getDimension());
                                 addColonyByWorld(colony);
                             }
                         }
@@ -989,7 +1019,7 @@ public final class ColonyManager
     {
         if (numWorldsLoaded > 0 && saveNeeded)
         {
-            saveColonies();
+            saveColonies(false);
         }
 
         try(FileOutputStream fos = new FileOutputStream(getBackupSaveLocation(new Date())))
@@ -1150,7 +1180,7 @@ public final class ColonyManager
         {
             if (world.provider.getDimension() == 0)
             {
-                saveColonies();
+                saveColonies(true);
             }
 
 
