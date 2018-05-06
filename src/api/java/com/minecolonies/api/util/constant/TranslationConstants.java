@@ -239,6 +239,10 @@ public final class TranslationConstants
     public static final String ONLY_X_BARBARIANS_LEFT_MESSAGE                                      = "com.minecolonies.coremod.barbarians.left";
     @NonNls
     public static final String ALL_BARBARIANS_KILLED_MESSAGE                                       = "com.minecolonies.coremod.barbarians.killed";
+    @NonNls
+    public static final String CANT_PLACE_COLONY_TOO_CLOSE_TO_SPAWN                                = "com.minecolonies.coremod.tooClose";
+    @NonNls
+    public static final String CANT_PLACE_COLONY_TOO_FAR_FROM_SPAWN                                = "com.minecolonies.coremod.tooFar";
 
     @NonNls
     public static final String UNABLE_TO_ADD_RECIPE_MESSAGE                                        = "com.minecolonies.coremod.recipe.unable";
