@@ -80,50 +80,66 @@ public class CitizenData implements ICapabilityProvider
      * Minimum saturation of a citizen.
      */
     private static final int MIN_SATURATION = 0;
+
     /**
      * The unique citizen id.
      */
     private final int                          id;
+
     /**
      * The colony the citizen belongs to.
      */
     private final Colony                       colony;
+
+
+    /**
+     * Inventory of the citizen.
+     */
     private final InventoryCitizen             inventory;
+
     /**
      * The name of the citizen.
      */
     private       String                       name;
+
     /**
      * Boolean gender, true = female, false = male.
      */
     private       boolean                      female;
+
     /**
      * The id of the citizens texture.
      */
     private       int                          textureId;
+
     /**
      * The home building of the citizen.
      */
     @Nullable
     private       AbstractBuilding             homeBuilding;
+
     /**
      * The work building of the citizen.
      */
     @Nullable
     private       AbstractBuildingWorker       workBuilding;
+
     /**
      * The job of the citizen.
      */
     private       AbstractJob                  job;
+
     /**
      * If the citizen is dirty (Has to be updated on client side).
      */
     private       boolean                      dirty;
+
     /**
      * Its entitity.
      */
     @NotNull
     private       WeakReference<EntityCitizen> entity;
+
     /**
      * Attributes, which influence the workers behaviour.
      * May be added more later.
@@ -151,6 +167,11 @@ public class CitizenData implements ICapabilityProvider
      * This also includes the amount of experience within their Experience Bar.
      */
     private double experience;
+
+    /**
+     * The last position of the citizen.
+     */
+    private BlockPos lastPosition = new BlockPos(0, 0, 0);
 
     /**
      * Create a CitizenData given an ID.
@@ -254,8 +275,6 @@ public class CitizenData implements ICapabilityProvider
         {
             entity = new WeakReference<>(citizen);
         }
-
-        markDirty();
     }
 
     /**
@@ -455,9 +474,9 @@ public class CitizenData implements ICapabilityProvider
     private String generateName(@NotNull final Random rand)
     {
         String citizenName;
-        String firstName;
-        String middleInitial;
-        String lastName;
+        final String firstName;
+        final String middleInitial;
+        final String lastName;
 
         if (female)
         {
@@ -670,7 +689,7 @@ public class CitizenData implements ICapabilityProvider
      */
     public void updateCitizenEntityIfNecessary()
     {
-        if (!getCitizenEntity().isPresent())
+        if (!getCitizenEntity().isPresent() && colony.getWorld().isBlockLoaded(lastPosition))
         {
             final List<EntityCitizen> list = colony.getWorld()
                     .getEntities(EntityCitizen.class,
@@ -979,6 +998,24 @@ public class CitizenData implements ICapabilityProvider
     public int getDexterity()
     {
         return dexterity;
+    }
+
+    /**
+     * Set the last position of the citizen.
+     * @param lastPosition the last position.
+     */
+    public void setLastPosition(final BlockPos lastPosition)
+    {
+        this.lastPosition = lastPosition;
+    }
+
+    /**
+     * Get the last position of the citizen.
+     * @return the last position.
+     */
+    public BlockPos getLastPosition()
+    {
+        return lastPosition;
     }
 
     /**
