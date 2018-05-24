@@ -254,7 +254,7 @@ public abstract class AbstractJob<D extends IRequestSystemJobDataStore>
     }
 
     /**
-     * Get the Colony that this Job is associated with (shortcut for getCitizen().getColony()).
+     * Get the Colony that this Job is associated with (shortcut for getAssignedCitizen().getColony()).
      *
      * @return {@link Colony} of the citizen.
      */
