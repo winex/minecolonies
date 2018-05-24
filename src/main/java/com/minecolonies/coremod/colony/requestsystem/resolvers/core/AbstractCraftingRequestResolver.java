@@ -216,7 +216,7 @@ public abstract class AbstractCraftingRequestResolver extends AbstractRequestRes
         final int craftingCount = calculateMaxCraftingCount(requestStack, storage);
         return storage.getCleanedInput().stream()
                  .filter(s -> !ItemStackUtils.isEmpty(s.getItemStack()))
-                 .filter(s -> InventoryUtils.getItemCountInItemHandler(new InvWrapper(building.getMainWorker().getInventory()),
+                 .filter(s -> InventoryUtils.getItemCountInItemHandler(new InvWrapper(building.getMainCitizen().getInventory()),
                          stack -> !ItemStackUtils.isEmpty(stack) && s.getItemStack().isItemEqual(stack)) < s.getAmount())
                  .map(stack -> {
                      final ItemStack craftingHelperStack = stack.getItemStack().copy();
