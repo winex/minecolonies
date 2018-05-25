@@ -28,6 +28,7 @@ public final class NbtTagConstants
     public static final String TAG_PRIO_ID          = "prioId";
     public static final String TAG_COLONIES         = "colonies";
     public static final String TAG_UUID             = "uuid";
+    public static final String TAG_REQUEST_RESOLVER_ID = "requestResolverId";
     public static final String TAG_STATISTICS            = "statistics";
     public static final String TAG_MINER_STATISTICS      = "minerStatistics";
     public static final String TAG_MINER_ORES            = "ores";
