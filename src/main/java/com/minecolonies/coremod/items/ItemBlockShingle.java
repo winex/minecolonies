@@ -2,7 +2,6 @@ package com.minecolonies.coremod.items;
 
 import com.minecolonies.api.capabilities.CapabilityDispatcher;
 import com.minecolonies.api.capabilities.IShingleCapability;
-import com.minecolonies.api.util.ModCapabilities;
 import com.minecolonies.api.util.constant.Constants;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;

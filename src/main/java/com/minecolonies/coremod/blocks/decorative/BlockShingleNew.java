@@ -1,7 +1,6 @@
 package com.minecolonies.coremod.blocks.decorative;
 
 import com.minecolonies.api.capabilities.IShingleCapability;
-import com.minecolonies.api.util.ModCapabilities;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.coremod.blocks.AbstractBlockMinecoloniesStairs;
 import com.minecolonies.coremod.creativetab.ModCreativeTabs;

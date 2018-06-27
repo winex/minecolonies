@@ -1,6 +1,5 @@
 package com.minecolonies.coremod;
 
-import com.minecolonies.api.capabilities.CapabilityDispatcher;
 import com.minecolonies.api.colony.IColonyTagCapability;
 import com.minecolonies.api.configuration.Configurations;
 import com.minecolonies.api.util.constant.Constants;
@@ -63,7 +62,6 @@ public class MineColonies
         MinecraftForge.EVENT_BUS.register(new BarbarianSpawnEventHandler());
         MinecraftForge.EVENT_BUS.register(new EventHandler());
         MinecraftForge.EVENT_BUS.register(new FMLEventHandler());
-        CapabilityDispatcher.initialize();
     }
 
     /**
