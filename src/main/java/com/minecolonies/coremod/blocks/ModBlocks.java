@@ -218,6 +218,8 @@ public final class ModBlocks
         blockPaperWall.registerItemBlock(registry);
         blockHutCook.registerItemBlock(registry);
         blockShingleOak.registerItemBlock(registry);
+        blockShingleTop.registerItemBlock(registry);
+        blockShingleBottom.registerItemBlock(registry);
         blockShingleBirch.registerItemBlock(registry);
         blockShingleJungle.registerItemBlock(registry);
         blockShingleSpruce.registerItemBlock(registry);

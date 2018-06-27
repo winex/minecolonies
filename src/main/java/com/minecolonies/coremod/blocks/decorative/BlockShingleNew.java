@@ -1,10 +1,9 @@
 package com.minecolonies.coremod.blocks.decorative;
 
-import com.minecolonies.api.capabilities.IShingleCapability;
 import com.minecolonies.api.util.constant.Constants;
+import com.minecolonies.api.util.constant.NbtTagConstants;
 import com.minecolonies.coremod.blocks.AbstractBlockMinecoloniesStairs;
 import com.minecolonies.coremod.creativetab.ModCreativeTabs;
-import com.minecolonies.coremod.items.ItemBlockShingle;
 import com.minecolonies.coremod.tileentities.TileEntityShingle;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.ITileEntityProvider;
@@ -15,7 +14,9 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -77,7 +78,17 @@ public class BlockShingleNew extends AbstractBlockMinecoloniesStairs<BlockShingl
     @Override
     public void getSubBlocks(final CreativeTabs itemIn, final NonNullList<ItemStack> items)
     {
-        //TODO: implement
+        for (final BlockPlanks.EnumType woodType : BlockPlanks.EnumType.values())
+        {
+            ItemStack stack = new ItemStack(Item.getItemFromBlock(this));
+
+            final NBTTagCompound compound = new NBTTagCompound();
+            compound.setInteger(NbtTagConstants.TAG_WOOD_TYPE, woodType.getMetadata());
+
+            stack.setTagCompound(compound);
+
+            items.add(stack);
+        }
     }
 
     @Nullable
@@ -120,20 +131,18 @@ public class BlockShingleNew extends AbstractBlockMinecoloniesStairs<BlockShingl
     @Override
     public void onBlockPlacedBy(final World worldIn, final BlockPos pos, final IBlockState state, final EntityLivingBase placer, final ItemStack stack)
     {
-        if (!stack.hasCapability(ModCapabilities.MOD_SHINGLE_CAPABILITY, null))
-            throw new IllegalArgumentException("The given stack cannot make a shingle! It does not have the correct Capability!");
+        final NBTTagCompound compound = stack.getTagCompound();
 
-        final TileEntityShingle tileEntity = (TileEntityShingle) worldIn.getTileEntity(pos);
-
-        if (tileEntity != null
-              && stack.hasCapability(ModCapabilities.MOD_SHINGLE_CAPABILITY, null)
-              && stack.getCapability(ModCapabilities.MOD_SHINGLE_CAPABILITY, null) != null)
+        if (compound != null)
         {
-            final IShingleCapability capability = stack.getCapability(ModCapabilities.MOD_SHINGLE_CAPABILITY, null);
+            final BlockPlanks.EnumType woodType = BlockPlanks.EnumType.byMetadata(stack.getTagCompound().getInteger(NbtTagConstants.TAG_WOOD_TYPE));
 
-            if (capability != null)
+            TileEntityShingle tileEntity = (TileEntityShingle) worldIn.getTileEntity(pos);
+
+            if (tileEntity != null)
             {
-                tileEntity.setWoodType(capability.getWoodType());
+                tileEntity.setWoodType(woodType);
+                tileEntity.markDirty();
             }
         }
 
@@ -155,9 +164,17 @@ public class BlockShingleNew extends AbstractBlockMinecoloniesStairs<BlockShingl
     private ItemStack generateItemStackFromWorldPos(IBlockAccess world, BlockPos pos, IBlockState state) {
         TileEntity worldEntity = world.getTileEntity(pos);
 
-        if(!(worldEntity instanceof TileEntityShingle))
+        if(worldEntity == null || !(worldEntity instanceof TileEntityShingle))
             return ItemStack.EMPTY;
 
-        return new ItemStack(new ItemBlockShingle(this));
+        final TileEntityShingle tileEntity = (TileEntityShingle) worldEntity;
+
+        final NBTTagCompound compound = new NBTTagCompound();
+        compound.setInteger(NbtTagConstants.TAG_WOOD_TYPE, tileEntity.getWoodType().getMetadata());
+
+        final ItemStack stack = new ItemStack(Item.getItemFromBlock(state.getBlock()));
+        stack.setTagCompound(compound);
+
+        return stack;
     }
 }

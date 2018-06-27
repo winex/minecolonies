@@ -1,22 +1,19 @@
 package com.minecolonies.coremod.items;
 
-import com.minecolonies.api.capabilities.CapabilityDispatcher;
-import com.minecolonies.api.capabilities.IShingleCapability;
-import com.minecolonies.api.util.constant.Constants;
-import net.minecraft.block.Block;
+import com.minecolonies.api.util.constant.NbtTagConstants;
+import com.minecolonies.coremod.blocks.decorative.BlockShingleNew;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-
-import javax.annotation.Nullable;
+import net.minecraft.block.BlockPlanks.EnumType;
 
 public class ItemBlockShingle extends ItemBlock
 {
 
-    public ItemBlockShingle(Block block)
+    private EnumType woodType;
+
+    public ItemBlockShingle(BlockShingleNew block)
     {
         super(block);
         this.setRegistryName(block.getRegistryName());
@@ -25,37 +22,23 @@ public class ItemBlockShingle extends ItemBlock
     @Override
     public String getItemStackDisplayName(final ItemStack stack)
     {
-        if (!stack.hasCapability(ModCapabilities.MOD_SHINGLE_CAPABILITY, null))
+
+        NBTTagCompound compound = stack.getTagCompound();
+
+        if (compound == null)
         {
-            return super.getItemStackDisplayName(stack);
+            stack.setTagCompound(new NBTTagCompound());
+            compound = stack.getTagCompound();
         }
 
-        IShingleCapability capability = stack.getCapability(ModCapabilities.MOD_SHINGLE_CAPABILITY, null);
-        if (capability != null)
+        if (compound != null
+          && compound.hasKey(NbtTagConstants.TAG_WOOD_TYPE))
         {
-            return new TextComponentTranslation(this.getUnlocalizedName() + ".name") + " " + capability.getWoodType().getName();
+            return new TextComponentTranslation(this.getUnlocalizedName() + ".name")
+                     + " "
+                     + EnumType.byMetadata(compound.getInteger(NbtTagConstants.TAG_WOOD_TYPE)).getName();
         }
 
         return super.getItemStackDisplayName(stack);
-    }
-
-    @Nullable
-    @Override
-    public ICapabilityProvider initCapabilities(final ItemStack stack, @Nullable final NBTTagCompound nbt)
-    {
-        if (stack.getItem() == null)
-            return null;
-
-        CapabilityDispatcher internetParentDispatcher = new CapabilityDispatcher();
-        internetParentDispatcher.registerNewInstance(ModCapabilities.MOD_SHINGLE_CAPABILITY);
-
-        if (nbt != null)
-        {
-            NBTTagCompound parentCompound =
-              nbt.getCompoundTag(new ResourceLocation(Constants.MOD_ID, Constants.CAPABILITY_DEFAULT).toString());
-            internetParentDispatcher.deserializeNBT(parentCompound);
-        }
-
-        return internetParentDispatcher;
     }
 }
