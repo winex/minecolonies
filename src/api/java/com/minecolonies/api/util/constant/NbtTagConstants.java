@@ -67,6 +67,11 @@ public final class NbtTagConstants
     public static final String CLOSE_CHUNKS_TO_LOAD_TAG   = "closeChunks";
 
     /**
+     * Tags used by the Shingle tile entity.
+     */
+    public static final String TAG_WOOD_TYPE = "type";
+
+    /**
      * Tag used to store the containers to NBT.
      */
     public static final String TAG_CONTAINERS = "Containers";

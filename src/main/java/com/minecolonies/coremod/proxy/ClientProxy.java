@@ -6,6 +6,7 @@ import com.minecolonies.coremod.blocks.*;
 import com.minecolonies.coremod.blocks.cactus.BlockCactusDoor;
 import com.minecolonies.coremod.blocks.decorative.BlockPaperwall;
 import com.minecolonies.coremod.blocks.decorative.BlockShingle;
+import com.minecolonies.coremod.blocks.decorative.BlockShingleNew;
 import com.minecolonies.coremod.blocks.decorative.BlockTimberFrame;
 import com.minecolonies.coremod.blocks.schematic.BlockSubstitution;
 import com.minecolonies.coremod.blocks.types.PaperwallType;
@@ -31,13 +32,17 @@ import com.minecolonies.structures.event.RenderEventHandler;
 import com.minecolonies.structures.helpers.Settings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.BlockStairs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.renderer.ItemMeshDefinition;
+import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.stats.RecipeBook;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -243,6 +248,25 @@ public class ClientProxy extends CommonProxy
         ModelLoader.setCustomStateMapper(ModBlocks.blockCactusDoor, new StateMap.Builder().ignore(BlockCactusDoor.POWERED).build());
         ModelLoader.setCustomStateMapper(ModBlocks.blockPaperWall, new StateMap.Builder().withName(BlockPaperwall.VARIANT).withSuffix("_blockPaperwall").build());
 
+
+        /*ModelLoader.setCustomMeshDefinition(Item.getItemFromBlock(ModBlocks.blockShingleTop), new ItemMeshDefinition() {
+            @Override
+            public ModelResourceLocation getModelLocation(ItemStack stack) {
+                return new ModelResourceLocation(new ResourceLocation(Constants.MOD_ID,
+                  BlockShingleNew.BLOCK_PREFIX + "_" + BlockStairs.EnumHalf.TOP.getName()), INVENTORY);
+            }
+        });
+
+        ModelBakery.registerItemVariants(Item.getItemFromBlock(ModBlocks.blockShingleTop), new ModelResourceLocation());*/
+
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.blockShingleTop), 0,
+              new ModelResourceLocation(new ResourceLocation(Constants.MOD_ID,
+                BlockShingleNew.BLOCK_PREFIX + "_" + BlockStairs.EnumHalf.TOP.getName()), INVENTORY));
+
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.blockShingleBottom), 0,
+              new ModelResourceLocation(new ResourceLocation(Constants.MOD_ID,
+                BlockShingleNew.BLOCK_PREFIX + "_" + BlockStairs.EnumHalf.BOTTOM.getName()), INVENTORY));
+
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.blockShingleOak), 0,
                 new ModelResourceLocation(new ResourceLocation(Constants.MOD_ID,
                         BlockShingle.BLOCK_PREFIX + "_" + BlockPlanks.EnumType.OAK.getName()), INVENTORY));
@@ -272,6 +296,12 @@ public class ClientProxy extends CommonProxy
             ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.blockPaperWall), type.getMetadata(),
               new ModelResourceLocation(ModBlocks.blockPaperWall.getRegistryName() + "_" + type.getName(), INVENTORY));
         }
+
+        /*for (final BlockShingleNew shingle : ModBlocks.getShingles())
+        {
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(shingle), 0,
+              new ModelResourceLocation(shingle.getRegistryName(), INVENTORY));
+        }*/
 
         for (final BlockTimberFrame frame : ModBlocks.getTimberFrames())
         {

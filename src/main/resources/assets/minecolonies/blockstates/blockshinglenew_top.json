@@ -1,0 +1,40 @@
+{
+  "forge_marker": 1,
+  "variants": {
+    "variant": {
+      "oak": { "textures": { "plank": "blocks/planks_jungle" } },
+      "spruce": { "textures": { "plank": "blocks/planks_spruce" } },
+      "birch": { "textures": { "plank": "blocks/planks_birch" } },
+      "dark_oak": { "textures": { "plank": "blocks/planks_dark_oak" } },
+      "jungle": { "textures": { "plank": "blocks/planks_jungle" } },
+      "acacia": { "textures": { "plank": "blocks/planks_acacia" } }
+    },
+    "half": {
+      "bottom": {},
+      "top": {}
+    },
+    "facing": {
+      "south": { "y": 180, "x": 180 },
+      "north": { "y": 0, "x": 180 },
+      "west": { "y": 270, "x": 180 },
+      "east": {"y": 90, "x": 180 }
+    },
+    "shape": {
+      "straight": {
+        "model": "minecolonies:shingle/shingle_straight"
+      },
+      "outer_right": {
+        "model": "minecolonies:shingle/shingle_convex"
+      },
+      "outer_left": {
+        "model": "minecolonies:shingle/shingle_convex"
+      },
+      "inner_right": {
+        "model": "minecolonies:shingle/shingle_concave"
+      },
+      "inner_left": {
+        "model": "minecolonies:shingle/shingle_concave"
+      }
+    }
+  }
+}

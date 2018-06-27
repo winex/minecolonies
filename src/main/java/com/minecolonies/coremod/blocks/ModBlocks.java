@@ -9,6 +9,7 @@ import com.minecolonies.coremod.blocks.schematic.BlockWaypoint;
 import com.minecolonies.coremod.blocks.types.TimberFrameType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.BlockStairs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemSlab;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -31,38 +32,39 @@ public final class ModBlocks
      * References can be made to here.
      */
 
-    private static final List<BlockTimberFrame>         timberFrames = new ArrayList<>();
-    public static        BlockHutTownHall               blockHutTownHall;
-    public static        BlockHutCitizen                blockHutCitizen;
-    public static        BlockHutMiner                  blockHutMiner;
-    public static        BlockHutLumberjack             blockHutLumberjack;
-    public static        BlockHutBaker                  blockHutBaker;
-    public static        BlockHutBuilder                blockHutBuilder;
-    public static        BlockHutDeliveryman            blockHutDeliveryman;
-    public static        BlockHutBlacksmith             blockHutBlacksmith;
-    public static        BlockHutStonemason             blockHutStonemason;
-    public static        BlockHutFarmer                 blockHutFarmer;
-    public static        BlockHutFisherman              blockHutFisherman;
-    public static        BlockSubstitution              blockSubstitution;
-    public static        BlockBarracksTowerSubstitution blockBarracksTowerSubstitution;
-    public static        BlockSolidSubstitution         blockSolidSubstitution;
-    public static        BlockHutField                  blockHutField;
-    public static        BlockHutGuardTower             blockHutGuardTower;
-    public static        BlockHutWareHouse              blockHutWareHouse;
-    public static        BlockHutShepherd               blockHutShepherd;
-    public static        BlockHutCowboy                 blockHutCowboy;
-    public static        BlockHutSwineHerder            blockHutSwineHerder;
-    public static        BlockHutChickenHerder          blockHutChickenHerder;
-    public static        BlockHutBarracks               blockHutBarracks;
-    public static        BlockHutBarracksTower          blockHutBarracksTower;
-    public static        BlockHutCook                   blockHutCook;
-    public static        BlockHutSmeltery               blockHutSmeltery;
-    public static        BlockCactusPlank               blockCactusPlank;
-    public static        BlockCactusDoor                blockCactusDoor;
-    public static        BlockCactusTrapdoor            blockCactusTrapdoor;
-    public static        BlockCactusStair               blockCactusStair;
-    public static        BlockCactusSlabHalf            blockCactusSlabHalf;
-    public static        BlockCactusSlabDouble          blockCactusSlabDouble;
+    private static final List<BlockTimberFrame> timberFrames = new ArrayList<>();
+    //private static final List<BlockShingleNew> shingles = new ArrayList<>();
+    public static BlockHutTownHall               blockHutTownHall;
+    public static BlockHutCitizen                blockHutCitizen;
+    public static BlockHutMiner                  blockHutMiner;
+    public static BlockHutLumberjack             blockHutLumberjack;
+    public static BlockHutBaker                  blockHutBaker;
+    public static BlockHutBuilder                blockHutBuilder;
+    public static BlockHutDeliveryman            blockHutDeliveryman;
+    public static BlockHutBlacksmith             blockHutBlacksmith;
+    public static BlockHutStonemason             blockHutStonemason;
+    public static BlockHutFarmer                 blockHutFarmer;
+    public static BlockHutFisherman              blockHutFisherman;
+    public static BlockSubstitution              blockSubstitution;
+    public static BlockBarracksTowerSubstitution blockBarracksTowerSubstitution;
+    public static BlockSolidSubstitution         blockSolidSubstitution;
+    public static BlockHutField                  blockHutField;
+    public static BlockHutGuardTower             blockHutGuardTower;
+    public static BlockHutWareHouse              blockHutWareHouse;
+    public static BlockHutShepherd               blockHutShepherd;
+    public static BlockHutCowboy                 blockHutCowboy;
+    public static BlockHutSwineHerder            blockHutSwineHerder;
+    public static BlockHutChickenHerder          blockHutChickenHerder;
+    public static BlockHutBarracks               blockHutBarracks;
+    public static BlockHutBarracksTower          blockHutBarracksTower;
+    public static BlockHutCook                   blockHutCook;
+    public static BlockHutSmeltery               blockHutSmeltery;
+    public static BlockCactusPlank               blockCactusPlank;
+    public static BlockCactusDoor                blockCactusDoor;
+    public static BlockCactusTrapdoor            blockCactusTrapdoor;
+    public static BlockCactusStair               blockCactusStair;
+    public static BlockCactusSlabHalf            blockCactusSlabHalf;
+    public static BlockCactusSlabDouble          blockCactusSlabDouble;
 
     /**
      * Utility blocks.
@@ -72,6 +74,8 @@ public final class ModBlocks
     public static BlockWaypoint         blockWayPoint;
     public static BlockInfoPoster       blockInfoPoster;
     public static BlockPaperwall        blockPaperWall;
+    public static BlockShingleNew       blockShingleTop;
+    public static BlockShingleNew       blockShingleBottom;
     public static BlockShingle          blockShingleOak;
     public static BlockShingle          blockShingleBirch;
     public static BlockShingle          blockShingleJungle;
@@ -85,6 +89,11 @@ public final class ModBlocks
     {
         return new ArrayList<>(timberFrames);
     }
+
+    /*public static List<BlockShingleNew> getShingles()
+    {
+        return new ArrayList<>(shingles);
+    }*/
 
     /**
      * Private constructor to hide the implicit public one.
@@ -139,6 +148,11 @@ public final class ModBlocks
 
         blockCactusStair = new BlockCactusStair(new BlockPlanks().getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.OAK)).registerBlock(registry);
 
+        blockShingleTop = new BlockShingleNew(new BlockPlanks().getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.OAK),
+          BlockShingleNew.BLOCK_PREFIX + "_" + BlockStairs.EnumHalf.TOP.getName()).registerBlock(registry);
+        blockShingleBottom = new BlockShingleNew(new BlockPlanks().getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.OAK),
+          BlockShingleNew.BLOCK_PREFIX + "_" + BlockStairs.EnumHalf.BOTTOM.getName()).registerBlock(registry);
+
         blockShingleOak = new BlockShingle(new BlockPlanks().getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.OAK),
           BlockShingle.BLOCK_PREFIX + "_" + BlockPlanks.EnumType.OAK.getName()).registerBlock(registry);
         blockShingleJungle = new BlockShingle(new BlockPlanks().getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.JUNGLE),
@@ -153,6 +167,15 @@ public final class ModBlocks
           BlockShingle.BLOCK_PREFIX + "_" + BlockPlanks.EnumType.ACACIA.getName()).registerBlock(registry);
         blockShingleSlab = new BlockShingleSlab().registerBlock(registry);
         multiBlock = new MultiBlock().registerBlock(registry);
+
+        /*for (final BlockPlanks.EnumType type : BlockPlanks.EnumType.values())
+        {
+            shingles.add(new BlockShingleNew(new BlockPlanks().getDefaultState().withProperty(BlockPlanks.VARIANT, type),
+              BlockShingleNew.BLOCK_PREFIX + "_" + BlockStairs.EnumHalf.TOP.getName()).registerBlock(registry));
+
+            shingles.add(new BlockShingleNew(new BlockPlanks().getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.OAK),
+              BlockShingleNew.BLOCK_PREFIX + "_" + BlockStairs.EnumHalf.BOTTOM.getName()).registerBlock(registry));
+        }*/
 
         for (final BlockPlanks.EnumType type : BlockPlanks.EnumType.values())
         {
@@ -207,6 +230,10 @@ public final class ModBlocks
         blockCactusTrapdoor.registerItemBlock(registry);
         blockCactusStair.registerItemBlock(registry);
         registry.register(new ItemSlab(blockCactusSlabHalf, blockCactusSlabHalf, blockCactusSlabDouble).setRegistryName(blockCactusSlabHalf.getRegistryName()));
+        /*for (final BlockShingleNew shingle : shingles)
+        {
+            shingle.registerItemBlock(registry);
+        }*/
         for (final BlockTimberFrame frame : timberFrames)
         {
             frame.registerItemBlock(registry);

@@ -23,6 +23,8 @@ public final class ModItems
     public static Item chiefSword;
     public static Item clipboard;
     public static Item itemCactusDoor;
+    public static Item itemBlockShingleTop;
+    public static Item itemBlockShingleBottom;
 
     public static Item itemAchievementProxySettlement;
     public static Item itemAchievementProxyTown;
@@ -53,6 +55,8 @@ public final class ModItems
         supplyCamp = new ItemSupplyCampDeployer();
         ancientTome = new ItemAncientTome();
         chiefSword = new ItemChiefSword();
+        itemBlockShingleTop = new ItemBlockShingle(ModBlocks.blockShingleTop);
+        itemBlockShingleBottom = new ItemBlockShingle(ModBlocks.blockShingleBottom);
         clipboard = new ItemClipBoard();
         itemCactusDoor = new ItemCactusDoor(ModBlocks.blockCactusDoor, "cactusdoor");
         itemAchievementProxySettlement = new ItemAchievementProxy("sizeSettlement");
@@ -69,6 +73,8 @@ public final class ModItems
         registry.register(supplyCamp);
         registry.register(ancientTome);
         registry.register(chiefSword);
+        registry.register(itemBlockShingleTop);
+        registry.register(itemBlockShingleBottom);
         registry.register(itemAchievementProxySettlement);
         registry.register(itemAchievementProxyTown);
         registry.register(itemAchievementProxyCity);
