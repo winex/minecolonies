@@ -1,7 +1,9 @@
 package com.minecolonies.coremod.items;
 
 import com.minecolonies.coremod.blocks.ModBlocks;
+import com.minecolonies.coremod.blocks.decorative.BlockShingleNew;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraftforge.registries.IForgeRegistry;
 
 /**
@@ -27,6 +29,9 @@ public final class ModItems
     public static Item itemAchievementProxyTown;
     public static Item itemAchievementProxyCity;
     public static Item itemAchievementProxyMetropolis;
+
+    public static ItemBlock itemBlockShinglesNewTop;
+    public static ItemBlock itemBlockShinglesNewBottom;
 
     /**
      * Private constructor to hide the implicit public one.
@@ -59,6 +64,9 @@ public final class ModItems
         itemAchievementProxyCity = new ItemAchievementProxy("sizeCity");
         itemAchievementProxyMetropolis = new ItemAchievementProxy("sizeMetropolis");
 
+        itemBlockShinglesNewTop = new ItemBlockShingleNew(ModBlocks.blockShingleTop);
+        itemBlockShinglesNewBottom = new ItemBlockShingleNew(ModBlocks.blockShingleBottom);
+
         registry.register(supplyChest);
         registry.register(buildTool);
         registry.register(scanTool);
@@ -74,5 +82,8 @@ public final class ModItems
         registry.register(itemAchievementProxyMetropolis);
         registry.register(clipboard);
         registry.register(itemCactusDoor);
+
+        registry.register(itemBlockShinglesNewTop);
+        registry.register(itemBlockShinglesNewBottom);
     }
 }

@@ -70,6 +70,7 @@ public final class NbtTagConstants
      * Tags used by the Shingle tile entity.
      */
     public static final String TAG_WOOD_TYPE = "type";
+    public static final String TAG_FACE_TYPE = "face";
 
     /**
      * Tag used to store the containers to NBT.

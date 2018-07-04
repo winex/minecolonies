@@ -217,20 +217,21 @@ public final class ModBlocks
         blockInfoPoster.registerItemBlock(registry);
         blockPaperWall.registerItemBlock(registry);
         blockHutCook.registerItemBlock(registry);
-        blockShingleOak.registerItemBlock(registry);
-        blockShingleTop.registerItemBlock(registry);
-        blockShingleBottom.registerItemBlock(registry);
-        blockShingleBirch.registerItemBlock(registry);
+        //blockShingleOak.registerItemBlock(registry);
+        //blockShingleTop.registerItemBlock(registry);
+        //blockShingleBottom.registerItemBlock(registry);
+        /*blockShingleBirch.registerItemBlock(registry);
         blockShingleJungle.registerItemBlock(registry);
         blockShingleSpruce.registerItemBlock(registry);
         blockShingleDarkOak.registerItemBlock(registry);
-        blockShingleAcacia.registerItemBlock(registry);
+        blockShingleAcacia.registerItemBlock(registry);*/
         blockShingleSlab.registerItemBlock(registry);
         blockHutSmeltery.registerItemBlock(registry);
         multiBlock.registerItemBlock(registry);
         blockCactusPlank.registerItemBlock(registry);
         blockCactusTrapdoor.registerItemBlock(registry);
         blockCactusStair.registerItemBlock(registry);
+
         registry.register(new ItemSlab(blockCactusSlabHalf, blockCactusSlabHalf, blockCactusSlabDouble).setRegistryName(blockCactusSlabHalf.getRegistryName()));
         /*for (final BlockShingleNew shingle : shingles)
         {

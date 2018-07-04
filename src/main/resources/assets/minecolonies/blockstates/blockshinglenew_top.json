@@ -1,13 +1,120 @@
 {
   "forge_marker": 1,
   "variants": {
-    "variant": {
-      "oak": { "textures": { "plank": "blocks/planks_jungle" } },
+    "wood_type": {
+      "oak": { "textures": { "plank": "blocks/planks_oak" } },
       "spruce": { "textures": { "plank": "blocks/planks_spruce" } },
       "birch": { "textures": { "plank": "blocks/planks_birch" } },
-      "dark_oak": { "textures": { "plank": "blocks/planks_dark_oak" } },
+      "dark_oak": { "textures": { "plank": "blocks/planks_big_oak" } },
       "jungle": { "textures": { "plank": "blocks/planks_jungle" } },
       "acacia": { "textures": { "plank": "blocks/planks_acacia" } }
+    },
+    "face_type": {
+      "clay": { "textures": {
+        "0": "minecolonies:blocks/shingle/clay_shingle_1",
+        "1": "minecolonies:blocks/shingle/clay_shingle_2",
+        "2": "minecolonies:blocks/shingle/clay_shingle_3"
+      }},
+      "black": { "textures": {
+        "0": "minecolonies:blocks/shingle/black_shingle_1",
+        "1": "minecolonies:blocks/shingle/black_shingle_2",
+        "2": "minecolonies:blocks/shingle/black_shingle_3"
+      }},
+      "blue": { "textures": {
+        "0": "minecolonies:blocks/shingle/blue_shingle_1",
+        "1": "minecolonies:blocks/shingle/blue_shingle_2",
+        "2": "minecolonies:blocks/shingle/blue_shingle_3"
+      }},
+      "brown": { "textures": {
+        "0": "minecolonies:blocks/shingle/brown_shingle_1",
+        "1": "minecolonies:blocks/shingle/brown_shingle_2",
+        "2": "minecolonies:blocks/shingle/brown_shingle_3"
+      }},
+      "cyan": { "textures": {
+        "0": "minecolonies:blocks/shingle/cyan_shingle_1",
+        "1": "minecolonies:blocks/shingle/cyan_shingle_2",
+        "2": "minecolonies:blocks/shingle/cyan_shingle_3"
+      }},
+      "dark_grey": { "textures": {
+        "0": "minecolonies:blocks/shingle/darkgrey_shingle_1",
+        "1": "minecolonies:blocks/shingle/darkgrey_shingle_2",
+        "2": "minecolonies:blocks/shingle/darkgrey_shingle_3"
+      }},
+      "green": { "textures": {
+        "0": "minecolonies:blocks/shingle/green_shingle_1",
+        "1": "minecolonies:blocks/shingle/green_shingle_2",
+        "2": "minecolonies:blocks/shingle/green_shingle_3"
+      }},
+      "light_blue": { "textures": {
+        "0": "minecolonies:blocks/shingle/lightblue_shingle_1",
+        "1": "minecolonies:blocks/shingle/lightblue_shingle_2",
+        "2": "minecolonies:blocks/shingle/lightblue_shingle_3"
+      }},
+      "lime": { "textures": {
+        "0": "minecolonies:blocks/shingle/lime_shingle_1",
+        "1": "minecolonies:blocks/shingle/lime_shingle_2",
+        "2": "minecolonies:blocks/shingle/lime_shingle_3"
+      }},
+      "magenta": { "textures": {
+        "0": "minecolonies:blocks/shingle/magenta_shingle_1",
+        "1": "minecolonies:blocks/shingle/magenta_shingle_2",
+        "2": "minecolonies:blocks/shingle/magenta_shingle_3"
+      }},
+      "orange": { "textures": {
+        "0": "minecolonies:blocks/shingle/orange_shingle_1",
+        "1": "minecolonies:blocks/shingle/orange_shingle_2",
+        "2": "minecolonies:blocks/shingle/orange_shingle_3"
+      }},
+      "pink": { "textures": {
+        "0": "minecolonies:blocks/shingle/pink_shingle_1",
+        "1": "minecolonies:blocks/shingle/pink_shingle_2",
+        "2": "minecolonies:blocks/shingle/pink_shingle_3"
+      }},
+      "purple": { "textures": {
+        "0": "minecolonies:blocks/shingle/purple_shingle_1",
+        "1": "minecolonies:blocks/shingle/purple_shingle_2",
+        "2": "minecolonies:blocks/shingle/purple_shingle_3"
+      }},
+      "red": { "textures": {
+        "0": "minecolonies:blocks/shingle/red_shingle_1",
+        "1": "minecolonies:blocks/shingle/red_shingle_2",
+        "2": "minecolonies:blocks/shingle/red_shingle_3"
+      }},
+      "white": { "textures": {
+        "0": "minecolonies:blocks/shingle/white_shingle_1",
+        "1": "minecolonies:blocks/shingle/white_shingle_2",
+        "2": "minecolonies:blocks/shingle/white_shingle_3"
+      }},
+      "yellow": { "textures": {
+        "0": "minecolonies:blocks/shingle/yellow_shingle_1",
+        "1": "minecolonies:blocks/shingle/yellow_shingle_2",
+        "2": "minecolonies:blocks/shingle/yellow_shingle_3"
+      }},
+      "blue_slate": { "textures": {
+        "0": "minecolonies:blocks/shingle/blueslate_shingle_1",
+        "1": "minecolonies:blocks/shingle/blueslate_shingle_2",
+        "2": "minecolonies:blocks/shingle/blueslate_shingle_3"
+      }},
+      "green_slate": { "textures": {
+        "0": "minecolonies:blocks/shingle/greenslate_shingle_1",
+        "1": "minecolonies:blocks/shingle/greenslate_shingle_2",
+        "2": "minecolonies:blocks/shingle/greenslate_shingle_3"
+      }},
+      "grey_slate": { "textures": {
+        "0": "minecolonies:blocks/shingle/greyslate_shingle_1",
+        "1": "minecolonies:blocks/shingle/greyslate_shingle_2",
+        "2": "minecolonies:blocks/shingle/greyslate_shingle_3"
+      }},
+      "moss_slate": { "textures": {
+        "0": "minecolonies:blocks/shingle/mossslate_shingle_1",
+        "1": "minecolonies:blocks/shingle/mossslate_shingle_2",
+        "2": "minecolonies:blocks/shingle/mossslate_shingle_3"
+      }},
+      "purple_slate": { "textures": {
+        "0": "minecolonies:blocks/shingle/purpleslate_shingle_1",
+        "1": "minecolonies:blocks/shingle/purpleslate_shingle_2",
+        "2": "minecolonies:blocks/shingle/purpleslate_shingle_3"
+      }}
     },
     "half": {
       "bottom": {},
@@ -21,7 +128,7 @@
     },
     "shape": {
       "straight": {
-        "model": "minecolonies:shingle/shingle_straight"
+        "model": "minecolonies:shingle/shingle_straight_top"
       },
       "outer_right": {
         "model": "minecolonies:shingle/shingle_convex"

@@ -8,6 +8,43 @@
     "plank": "blocks/planks_oak",
     "particle": "minecolonies:blocks/shingle/clay_shingle_1"
   },
+  "display": {
+    "gui": {
+      "rotation": [30, 35, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [0, 35, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    "thirdperson_righthand": {
+      "rotation": [0, 35, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    "firstperson_lefthand": {
+      "rotation": [0, 35, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.3, 0.3, 0.3]
+    },
+    "firstperson_righthand": {
+      "rotation": [0, 35, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.3, 0.3, 0.3]
+    },
+    "ground": {
+      "rotation": [0, 35, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.3, 0.3, 0.3]
+    },
+    "fixed": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 2, 0],
+      "scale": [1, 1, 1]
+    }
+  },
   "elements": [
     {
       "name": "middle support",

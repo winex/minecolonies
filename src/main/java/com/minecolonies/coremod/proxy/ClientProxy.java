@@ -2,6 +2,7 @@ package com.minecolonies.coremod.proxy;
 
 import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.constant.Constants;
+import com.minecolonies.api.util.constant.NbtTagConstants;
 import com.minecolonies.coremod.blocks.*;
 import com.minecolonies.coremod.blocks.cactus.BlockCactusDoor;
 import com.minecolonies.coremod.blocks.decorative.BlockPaperwall;
@@ -35,14 +36,11 @@ import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.renderer.ItemMeshDefinition;
-import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.stats.RecipeBook;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -245,29 +243,31 @@ public class ClientProxy extends CommonProxy
         createCustomModel(ModBlocks.multiBlock);
         createCustomModel(ModItems.itemCactusDoor);
 
+        // ItemBlocks
+        ModelLoader.setCustomMeshDefinition(ModItems.itemBlockShinglesNewTop, stack -> {
+            if (stack.getTagCompound() != null && stack.getTagCompound().hasKey(NbtTagConstants.TAG_WOOD_TYPE))
+            {
+                final BlockPlanks.EnumType woodType = BlockPlanks.EnumType.byMetadata(stack.getTagCompound().getInteger(NbtTagConstants.TAG_WOOD_TYPE));
+                final BlockShingleNew.EnumFace faceType = BlockShingleNew.EnumFace.byMetadata(stack.getTagCompound().getInteger(NbtTagConstants.TAG_FACE_TYPE));
+                return new ModelResourceLocation(ModItems.itemBlockShinglesNewTop.getRegistryName(), "face_type=" + faceType + ",facing=east,half=top,shape=straight,wood_type=" + woodType.getName());
+            }
+            return new ModelResourceLocation(ModItems.itemBlockShinglesNewTop.getRegistryName(), INVENTORY);
+        });
+
+        ModelLoader.setCustomMeshDefinition(ModItems.itemBlockShinglesNewBottom, stack -> {
+            if (stack.getTagCompound() != null && stack.getTagCompound().hasKey(NbtTagConstants.TAG_WOOD_TYPE))
+            {
+                final BlockPlanks.EnumType woodType = BlockPlanks.EnumType.byMetadata(stack.getTagCompound().getInteger(NbtTagConstants.TAG_WOOD_TYPE));
+                final BlockShingleNew.EnumFace faceType = BlockShingleNew.EnumFace.byMetadata(stack.getTagCompound().getInteger(NbtTagConstants.TAG_FACE_TYPE));
+                return new ModelResourceLocation(ModItems.itemBlockShinglesNewBottom.getRegistryName(), "face_type=" + faceType + ",facing=east,half=bottom,shape=straight,wood_type=" + woodType.getName());
+            }
+            return new ModelResourceLocation(ModItems.itemBlockShinglesNewBottom.getRegistryName(), INVENTORY);
+        });
+
         ModelLoader.setCustomStateMapper(ModBlocks.blockCactusDoor, new StateMap.Builder().ignore(BlockCactusDoor.POWERED).build());
         ModelLoader.setCustomStateMapper(ModBlocks.blockPaperWall, new StateMap.Builder().withName(BlockPaperwall.VARIANT).withSuffix("_blockPaperwall").build());
 
-
-        /*ModelLoader.setCustomMeshDefinition(Item.getItemFromBlock(ModBlocks.blockShingleTop), new ItemMeshDefinition() {
-            @Override
-            public ModelResourceLocation getModelLocation(ItemStack stack) {
-                return new ModelResourceLocation(new ResourceLocation(Constants.MOD_ID,
-                  BlockShingleNew.BLOCK_PREFIX + "_" + BlockStairs.EnumHalf.TOP.getName()), INVENTORY);
-            }
-        });
-
-        ModelBakery.registerItemVariants(Item.getItemFromBlock(ModBlocks.blockShingleTop), new ModelResourceLocation());*/
-
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.blockShingleTop), 0,
-              new ModelResourceLocation(new ResourceLocation(Constants.MOD_ID,
-                BlockShingleNew.BLOCK_PREFIX + "_" + BlockStairs.EnumHalf.TOP.getName()), INVENTORY));
-
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.blockShingleBottom), 0,
-              new ModelResourceLocation(new ResourceLocation(Constants.MOD_ID,
-                BlockShingleNew.BLOCK_PREFIX + "_" + BlockStairs.EnumHalf.BOTTOM.getName()), INVENTORY));
-
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.blockShingleOak), 0,
+        /*ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.blockShingleOak), 0,
                 new ModelResourceLocation(new ResourceLocation(Constants.MOD_ID,
                         BlockShingle.BLOCK_PREFIX + "_" + BlockPlanks.EnumType.OAK.getName()), INVENTORY));
 
@@ -289,7 +289,7 @@ public class ClientProxy extends CommonProxy
 
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.blockShingleAcacia), 0,
                 new ModelResourceLocation(new ResourceLocation(Constants.MOD_ID,
-                        BlockShingle.BLOCK_PREFIX + "_" + BlockPlanks.EnumType.ACACIA.getName()), INVENTORY));
+                        BlockShingle.BLOCK_PREFIX + "_" + BlockPlanks.EnumType.ACACIA.getName()), INVENTORY));*/
 
         for (final PaperwallType type : PaperwallType.values())
         {
