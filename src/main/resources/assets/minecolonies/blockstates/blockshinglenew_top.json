@@ -100,7 +100,7 @@
         "1": "minecolonies:blocks/shingle/greenslate_shingle_2",
         "2": "minecolonies:blocks/shingle/greenslate_shingle_3"
       }},
-      "grey_slate": { "textures": {
+      "slate": { "textures": {
         "0": "minecolonies:blocks/shingle/greyslate_shingle_1",
         "1": "minecolonies:blocks/shingle/greyslate_shingle_2",
         "2": "minecolonies:blocks/shingle/greyslate_shingle_3"

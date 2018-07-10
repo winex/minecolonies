@@ -1,5 +1,9 @@
 {
   "conditions": {
     "config_condition" : "com.minecolonies.coremod.util.ConfigCondition"
+  },
+  "recipes": {
+    "shingles_factory" : "com.minecolonies.coremod.recipes.BlockShingleNewRecipeFactory",
+    "dye_shingles_factory" : "com.minecolonies.coremod.recipes.BlockShingleDyeRecipeFactory"
   }
 }

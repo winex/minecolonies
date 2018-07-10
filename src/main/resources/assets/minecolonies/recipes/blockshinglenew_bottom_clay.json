@@ -1,5 +1,5 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "minecolonies:shingles_factory",
   "pattern": [
     "B  ",
     "SB ",
@@ -7,8 +7,8 @@
   ],
   "key": {
     "P": {
-      "item": "minecraft:planks",
-      "data": 0
+      "type": "forge:ore_dict",
+      "ore": "plankWood"
     },
     "S": {
       "item": "minecraft:stick"
@@ -18,7 +18,7 @@
     }
   },
   "result": {
-    "item": "minecolonies:blockshingle_oak",
+    "item": "minecolonies:blockshinglenew_bottom",
     "count": 8
   }
 }

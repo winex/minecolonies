@@ -1,0 +1,17 @@
+{
+  "type": "minecolonies:dye_shingles_factory",
+  "face_meta": 2,
+  "ingredients": [
+    {
+      "type": "forge:ore_dict",
+      "ore": "dyeBlue"
+    },
+    {
+      "item": "minecolonies:blockshinglenew_bottom"
+    }
+  ],
+  "result": {
+    "item": "minecolonies:blockshinglenew_bottom",
+    "count": 1
+  }
+}

@@ -39,6 +39,9 @@ public class BlockShingleNew extends AbstractBlockMinecoloniesStairs<BlockShingl
     public static final PropertyEnum<BlockPlanks.EnumType> WOOD_TYPE = PropertyEnum.create("wood_type", BlockPlanks.EnumType.class);
     public static final PropertyEnum<EnumFace> FACE_TYPE = PropertyEnum.create("face_type", EnumFace.class);
 
+    public static final String TYPE_CLAY = "clay";
+    public static final String TYPE_SLATE = "slate";
+
     /**
      * The hardness this block has.
      */
@@ -75,7 +78,7 @@ public class BlockShingleNew extends AbstractBlockMinecoloniesStairs<BlockShingl
     {
         setRegistryName(name);
         setUnlocalizedName(String.format("%s.%s", Constants.MOD_ID.toLowerCase(Locale.US), name));
-        setCreativeTab(ModCreativeTabs.MINECOLONIES);
+        setCreativeTab(ModCreativeTabs.SHINGLES);
         setHardness(BLOCK_HARDNESS);
         setResistance(RESISTANCE);
         this.useNeighborBrightness = true;
@@ -210,40 +213,63 @@ public class BlockShingleNew extends AbstractBlockMinecoloniesStairs<BlockShingl
     public enum EnumFace implements IStringSerializable
     {
         //Simple
-        CLAY(0, "clay"),
+        CLAY(0, "clay", TYPE_CLAY),
 
         // Dye colors
-        BLACK(1, "black"),
-        BLUE(2, "blue"),
-        BROWN(3, "brown"),
-        CYAN(4, "cyan"),
-        DARK_GREY(5, "dark_grey"),
-        GREEN(6, "green"),
-        LIGHT_BLUE(7, "light_blue"),
-        LIME(8, "lime"),
-        MAGENTA(9, "magenta"),
-        ORANGE(10, "orange"),
-        PINK(11, "pink"),
-        PURPLE(12, "purple"),
-        RED(13, "red"),
-        WHITE(14, "white"),
-        YELLOW(15, "yellow"),
+        BLACK(1, "black", TYPE_CLAY),
+        BLUE(2, "blue", TYPE_CLAY),
+        BROWN(3, "brown", TYPE_CLAY),
+        CYAN(4, "cyan", TYPE_CLAY),
+        DARK_GREY(5, "dark_grey", TYPE_CLAY),
+        GREEN(6, "green", TYPE_CLAY),
+        LIGHT_BLUE(7, "light_blue", TYPE_CLAY),
+        LIME(8, "lime", TYPE_CLAY),
+        MAGENTA(9, "magenta", TYPE_CLAY),
+        ORANGE(10, "orange", TYPE_CLAY),
+        PINK(11, "pink", TYPE_CLAY),
+        PURPLE(12, "purple", TYPE_CLAY),
+        RED(13, "red", TYPE_CLAY),
+        WHITE(14, "white", TYPE_CLAY),
+        YELLOW(15, "yellow", TYPE_CLAY),
 
         // Slate variants
-        BLUE_SLATE(16, "blue_slate"),
-        GREEN_SLATE(17, "green_slate"),
-        GREY_SLATE(18, "grey_slate"),
-        MOSS_SLATE(19, "moss_slate"),
-        PURPLE_SLATE(20, "purple_slate")
+        SLATE(16, "slate", TYPE_SLATE, 0),
+        BLUE_SLATE(17, "blue_slate", TYPE_SLATE, 2),
+        GREEN_SLATE(18, "green_slate", TYPE_SLATE, 6),
+        PURPLE_SLATE(19, "purple_slate", TYPE_SLATE, 12)
+        //MOSS_SLATE(19, "moss_slate", TYPE_SLATE), TODO: add that back in maybe. when i can figure out something that isn't ugly todo it.
         ;
 
         private static final EnumFace[] META_LOOKUP = new EnumFace[values().length];
         private final int meta;
         private final String name;
+        private final String type;
+        private final int clayVersionMeta;
 
-        EnumFace(int metaIn, String nameIn) {
+        EnumFace(final int metaIn, final String nameIn, final String type)
+        {
             this.meta = metaIn;
             this.name = nameIn;
+            this.type = type;
+            this.clayVersionMeta = 0;
+        }
+
+        EnumFace(final int metaIn, final String nameIn, final String type, final int clayVersion)
+        {
+            this.meta = metaIn;
+            this.name = nameIn;
+            this.type = type;
+            this.clayVersionMeta = clayVersion;
+        }
+
+        public int getClayVersionMeta()
+        {
+            return this.clayVersionMeta;
+        }
+
+        public String getType()
+        {
+            return this.type;
         }
 
         public int getMetadata() {
@@ -255,11 +281,21 @@ public class BlockShingleNew extends AbstractBlockMinecoloniesStairs<BlockShingl
             return this.name;
         }
 
-        public static EnumFace byMetadata(int meta) {
-            if (meta < 0 || meta >= META_LOOKUP.length) {
-                meta = 0;
+        public static EnumFace byType(final int clayVersionMeta, final String type)
+        {
+            for (final EnumFace face : values())
+            {
+                if (face.getClayVersionMeta() == clayVersionMeta
+                  && face.getType().equals(type))
+                {
+                    return face;
+                }
             }
+            return null;
+        }
 
+        public static EnumFace byMetadata(int meta)
+        {
             return META_LOOKUP[meta];
         }
 

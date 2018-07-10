@@ -5,12 +5,8 @@ import com.minecolonies.api.util.constant.NbtTagConstants;
 import com.minecolonies.coremod.blocks.decorative.BlockShingleNew;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.item.*;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraftforge.fluids.UniversalBucket;
 import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
 
 public class ItemBlockShingleNew extends ItemBlock
 {
@@ -30,8 +26,12 @@ public class ItemBlockShingleNew extends ItemBlock
         if (stack.getTagCompound().hasKey(NbtTagConstants.TAG_WOOD_TYPE))
         {
             final BlockPlanks.EnumType woodType = BlockPlanks.EnumType.byMetadata(stack.getTagCompound().getInteger(NbtTagConstants.TAG_WOOD_TYPE));
+            final BlockShingleNew.EnumFace faceType = BlockShingleNew.EnumFace.byMetadata(stack.getTagCompound().getInteger(NbtTagConstants.TAG_FACE_TYPE));
 
-            return new TextComponentTranslation("tile." + Constants.MOD_ID + ".blockshingle_" + woodType.getName() + ".name").getUnformattedComponentText();
+            final String faceName = new TextComponentTranslation(Constants.MOD_ID + ".blockshingle_face_" + faceType.getName() + ".name").getUnformattedComponentText();
+            final String woodName = new TextComponentTranslation(Constants.MOD_ID + ".blockshingle_wood_" + woodType.getName() + ".name").getUnformattedComponentText();
+            final String shingleName = new TextComponentTranslation(Constants.MOD_ID + ".blockshingle.name").getUnformattedComponentText();
+            return faceName + " " + woodName + " " + shingleName;
         }
 
         return super.getItemStackDisplayName(stack);

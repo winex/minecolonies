@@ -1,0 +1,17 @@
+{
+  "type": "minecolonies:dye_shingles_factory",
+  "face_meta": 12,
+  "ingredients": [
+    {
+      "type": "forge:ore_dict",
+      "ore": "dyePurple"
+    },
+    {
+      "item": "minecolonies:blockshinglenew_top"
+    }
+  ],
+  "result": {
+    "item": "minecolonies:blockshinglenew_top",
+    "count": 1
+  }
+}

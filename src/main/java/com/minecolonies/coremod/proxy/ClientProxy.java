@@ -251,7 +251,8 @@ public class ClientProxy extends CommonProxy
                 final BlockShingleNew.EnumFace faceType = BlockShingleNew.EnumFace.byMetadata(stack.getTagCompound().getInteger(NbtTagConstants.TAG_FACE_TYPE));
                 return new ModelResourceLocation(ModItems.itemBlockShinglesNewTop.getRegistryName(), "face_type=" + faceType + ",facing=east,half=top,shape=straight,wood_type=" + woodType.getName());
             }
-            return new ModelResourceLocation(ModItems.itemBlockShinglesNewTop.getRegistryName(), INVENTORY);
+            else
+            return new ModelResourceLocation(ModItems.itemBlockShinglesNewTop.getRegistryName(), "face_type=clay,facing=east,half=top,shape=straight,wood_type=oak");
         });
 
         ModelLoader.setCustomMeshDefinition(ModItems.itemBlockShinglesNewBottom, stack -> {
@@ -261,7 +262,7 @@ public class ClientProxy extends CommonProxy
                 final BlockShingleNew.EnumFace faceType = BlockShingleNew.EnumFace.byMetadata(stack.getTagCompound().getInteger(NbtTagConstants.TAG_FACE_TYPE));
                 return new ModelResourceLocation(ModItems.itemBlockShinglesNewBottom.getRegistryName(), "face_type=" + faceType + ",facing=east,half=bottom,shape=straight,wood_type=" + woodType.getName());
             }
-            return new ModelResourceLocation(ModItems.itemBlockShinglesNewBottom.getRegistryName(), INVENTORY);
+            return new ModelResourceLocation(ModItems.itemBlockShinglesNewTop.getRegistryName(), "face_type=clay,facing=east,half=bottom,shape=straight,wood_type=oak");
         });
 
         ModelLoader.setCustomStateMapper(ModBlocks.blockCactusDoor, new StateMap.Builder().ignore(BlockCactusDoor.POWERED).build());
