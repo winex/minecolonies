@@ -1,18 +1,23 @@
 package com.minecolonies.coremod.colony;
 
+import com.google.common.collect.ImmutableList;
 import com.minecolonies.api.colony.IColony;
+import com.minecolonies.api.colony.IColonyTagCapability;
+import com.minecolonies.api.colony.permissions.Rank;
 import com.minecolonies.api.colony.requestsystem.manager.IRequestManager;
 import com.minecolonies.api.colony.requestsystem.requester.IRequester;
 import com.minecolonies.api.configuration.Configurations;
-import com.minecolonies.api.util.*;
+import com.minecolonies.api.util.BlockPosUtil;
+import com.minecolonies.api.util.LanguageHandler;
 import com.minecolonies.api.util.constant.Suppression;
 import com.minecolonies.coremod.MineColonies;
-import com.minecolonies.coremod.colony.buildings.*;
+import com.minecolonies.coremod.colony.buildings.AbstractBuilding;
 import com.minecolonies.coremod.colony.managers.*;
 import com.minecolonies.coremod.colony.permissions.Permissions;
 import com.minecolonies.coremod.colony.requestsystem.management.manager.StandardRequestManager;
+import com.minecolonies.coremod.colony.workorders.WorkManager;
 import com.minecolonies.coremod.entity.ai.mobs.util.MobEventsUtils;
-import com.minecolonies.coremod.network.messages.*;
+import com.minecolonies.coremod.network.messages.ColonyViewRemoveWorkOrderMessage;
 import com.minecolonies.coremod.permissions.ColonyPermissionEventHandler;
 import com.minecolonies.coremod.util.ServerUtils;
 import net.minecraft.block.Block;
@@ -42,8 +47,8 @@ import static com.minecolonies.api.util.constant.ColonyConstants.*;
 import static com.minecolonies.api.util.constant.Constants.*;
 import static com.minecolonies.api.util.constant.NbtTagConstants.*;
 import static com.minecolonies.api.util.constant.TranslationConstants.*;
-import static com.minecolonies.coremod.colony.ColonyManager.FILENAME_COLONY;
-import static com.minecolonies.coremod.colony.ColonyManager.FILENAME_MINECOLONIES_PATH;
+import static com.minecolonies.coremod.MineColonies.CLOSE_COLONY_CAP;
+import static com.minecolonies.coremod.colony.ColonyManager.*;
 
 /**
  * This class describes a colony and contains all the data and methods for
@@ -154,6 +159,11 @@ public class Colony implements IColony
     private BlockPos center;
 
     /**
+     * The amount of nights since the last raid.
+     */
+    private int nightsSinceLastRaid = 0;
+
+    /**
      * The colony permission object.
      */
     @NotNull
@@ -178,6 +188,16 @@ public class Colony implements IColony
      * Field to check if the colony is dirty.
      */
     private boolean isDirty = false;
+
+    /**
+     * List of players visiting the colony.
+     */
+    private final List<EntityPlayer> visitingPlayers = new ArrayList<>();
+
+    /**
+     * Datas about the happiness of a colony
+     */
+    private final HappinessData happinessData = new HappinessData();
 
     /**
      * Constructor for a newly created Colony.
@@ -503,10 +523,16 @@ public class Colony implements IColony
         buildingManager.tick(event);
 
         getRequestManager().update();
+        packageManager.updateSubscribers();
 
-        if (event.phase == TickEvent.Phase.END)
+        final List<EntityPlayer> visitors = new ArrayList<>(visitingPlayers);
+        //Clean up visiting player.
+        for(final EntityPlayer player: visitors)
         {
-            packageManager.updateSubscribers();
+            if(!packageManager.getSubscribers().contains(player))
+            {
+                visitingPlayers.remove(player);
+            }
         }
     }
 
@@ -586,6 +612,16 @@ public class Colony implements IColony
     }
 
     /**
+     * Get all the data indices about happiness
+     *
+     * @return An instance of {@link HappinessData} containing all the datas
+     */
+    public HappinessData getHappinessData()
+    {
+        return happinessData;
+    }
+
+    /**
      * Any per-world-tick logic should be performed here.
      * NOTE: If the Colony's world isn't loaded, it won't have a world tick.
      * Use onServerTick for logic that should _always_ run.
@@ -603,24 +639,24 @@ public class Colony implements IColony
             return;
         }
 
-        if (event.phase == TickEvent.Phase.START)
+        //  Cleanup Buildings whose Blocks have gone AWOL
+        buildingManager.cleanUpBuildings(event);
+
+        // Clean up or spawn citizens.
+        if (!packageManager.getSubscribers().isEmpty())
         {
-            //  Cleanup Buildings whose Blocks have gone AWOL
-            buildingManager.cleanUpBuildings(event);
-
-            // Clean up or spawn citizens.
             citizenManager.onWorldTick(event);
+        }
 
-            if (shallUpdate(world, TICKS_SECOND)
-                  && event.world.getDifficulty() != EnumDifficulty.PEACEFUL
-                  && Configurations.gameplay.doBarbariansSpawn
-                  && barbarianManager.canHaveBarbEvents()
-                  && !world.getMinecraftServer().getPlayerList().getPlayers()
-                        .stream().filter(permissions::isSubscriber).collect(Collectors.toList()).isEmpty()
-                  && MobEventsUtils.isItTimeToRaid(event.world, this))
-            {
-                MobEventsUtils.barbarianEvent(event.world, this);
-            }
+        if (shallUpdate(world, TICKS_SECOND)
+                && event.world.getDifficulty() != EnumDifficulty.PEACEFUL
+                && Configurations.gameplay.doBarbariansSpawn
+                && barbarianManager.canHaveBarbEvents()
+                && !world.getMinecraftServer().getPlayerList().getPlayers()
+                .stream().filter(permissions::isSubscriber).collect(Collectors.toList()).isEmpty()
+                && MobEventsUtils.isItTimeToRaid(event.world, this))
+        {
+            MobEventsUtils.barbarianEvent(event.world, this);
         }
 
         buildingManager.onWorldTick(event);
@@ -628,7 +664,11 @@ public class Colony implements IColony
         if (isDay && !world.isDaytime())
         {
             isDay = false;
-            citizenManager.checkCitizensForHappiness();
+            nightsSinceLastRaid++;
+            if (!packageManager.getSubscribers().isEmpty())
+            {
+                citizenManager.checkCitizensForHappiness();
+            }
         }
         else if (!isDay && world.isDaytime())
         {
@@ -660,7 +700,7 @@ public class Colony implements IColony
 
     public boolean areAllColonyChunksLoaded(@NotNull final TickEvent.WorldTickEvent event)
     {
-        final int distanceFromCenter = Configurations.gameplay.workingRangeTownHall + 48 /* 3 chunks */ + 15 /* round up a chunk */;
+        final int distanceFromCenter = Configurations.gameplay.workingRangeTownHallChunks * BLOCKS_PER_CHUNK + 48 /* 3 chunks */ + BLOCKS_PER_CHUNK - 1 /* round up a chunk */;
         for (int x = -distanceFromCenter; x <= distanceFromCenter; x += CONST_CHUNKSIZE)
         {
             for (int z = -distanceFromCenter; z <= distanceFromCenter; z += CONST_CHUNKSIZE)
@@ -679,21 +719,23 @@ public class Colony implements IColony
      */
     private void updateWayPoints()
     {
-        final Random rand = new Random();
-        if (rand.nextInt(CHECK_WAYPOINT_EVERY) <= 1 && wayPoints.size() > 0)
+        if (world != null && world.rand.nextInt(CHECK_WAYPOINT_EVERY) <= 1 && !wayPoints.isEmpty())
         {
             final Object[] entries = wayPoints.entrySet().toArray();
-            final int stopAt = rand.nextInt(entries.length);
+            final int stopAt = world.rand.nextInt(entries.length);
             final Object obj = entries[stopAt];
 
             if (obj instanceof Map.Entry && ((Map.Entry) obj).getKey() instanceof BlockPos && ((Map.Entry) obj).getValue() instanceof IBlockState)
             {
                 @NotNull final BlockPos key = (BlockPos) ((Map.Entry) obj).getKey();
-                @NotNull final IBlockState value = (IBlockState) ((Map.Entry) obj).getValue();
-                if (world != null && world.getBlockState(key).getBlock() != (value.getBlock()))
+                if (world.isBlockLoaded(key))
                 {
-                    wayPoints.remove(key);
-                    markDirty();
+                    @NotNull final IBlockState value = (IBlockState) ((Map.Entry) obj).getValue();
+                    if (world.getBlockState(key).getBlock() != (value.getBlock()))
+                    {
+                        wayPoints.remove(key);
+                        markDirty();
+                    }
                 }
             }
         }
@@ -738,9 +780,9 @@ public class Colony implements IColony
     @Override
     public boolean isCoordInColony(@NotNull final World w, @NotNull final BlockPos pos)
     {
-        //  Perform a 2D distance calculation, so pass center.posY as the Y
-        return w.equals(getWorld())
-                 && BlockPosUtil.getDistanceSquared(center, new BlockPos(pos.getX(), center.getY(), pos.getZ())) <= MathUtils.square(Configurations.gameplay.workingRangeTownHall);
+        final Chunk chunk = w.getChunkFromBlockCoords(pos);
+        final IColonyTagCapability cap = chunk.getCapability(CLOSE_COLONY_CAP, null);
+        return cap.getOwningColony() == this.getID();
     }
 
     @Override
@@ -927,10 +969,13 @@ public class Colony implements IColony
      * @param building The upgraded building.
      * @param level    The new level.
      */
-    public void onBuildingUpgradeComplete(@NotNull final AbstractBuilding building, final int level)
+    public void onBuildingUpgradeComplete(@Nullable final AbstractBuilding building, final int level)
     {
-        building.onUpgradeComplete(level);
-        this.markDirty();
+        if (building != null)
+        {
+            building.onUpgradeComplete(level);
+            this.markDirty();
+        }
     }
 
     /**
@@ -1076,6 +1121,38 @@ public class Colony implements IColony
     }
 
     /**
+     * Get all visiting players.
+     * @return the list.
+     */
+    public ImmutableList<EntityPlayer> getVisitingPlayers()
+    {
+        return ImmutableList.copyOf(visitingPlayers);
+    }
+
+    @Override
+    public void addVisitingPlayer(final EntityPlayer player)
+    {
+        final Rank rank = getPermissions().getRank(player);
+        if(rank != Rank.OWNER && rank != Rank.OFFICER && !visitingPlayers.contains(player))
+        {
+            visitingPlayers.add(player);
+            LanguageHandler.sendPlayerMessage(player, ENTERING_COLONY_MESSAGE, this.getPermissions().getOwnerName());
+            LanguageHandler.sendPlayersMessage(getMessageEntityPlayers(), ENTERING_COLONY_MESSAGE_NOTIFY, player.getName());
+        }
+    }
+
+    @Override
+    public void removeVisitingPlayer(final EntityPlayer player)
+    {
+        if(!getMessageEntityPlayers().contains(player))
+        {
+            visitingPlayers.remove(player);
+            LanguageHandler.sendPlayerMessage(player, LEAVING_COLONY_MESSAGE, this.getPermissions().getOwnerName());
+            LanguageHandler.sendPlayersMessage(getMessageEntityPlayers(), LEAVING_COLONY_MESSAGE_NOTIFY, player.getName());
+        }
+    }
+
+    /**
      * Get the NBT tag of the colony.
      * @return the tag of it.
      */
@@ -1086,5 +1163,23 @@ public class Colony implements IColony
             this.writeToNBT(new NBTTagCompound());
         }
         return this.colonyTag;
+    }
+
+    /**
+     * Getter for the nights since the last raid.
+     * @return the number of nights.
+     */
+    public int getNightsSinceLastRaid()
+    {
+        return nightsSinceLastRaid;
+    }
+
+    /**
+     * Setter for the nights since the last raid.
+     * @param nights the number of nights.
+     */
+    public void setNightsSinceLastRaid(final int nights)
+    {
+        this.nightsSinceLastRaid = nights;
     }
 }

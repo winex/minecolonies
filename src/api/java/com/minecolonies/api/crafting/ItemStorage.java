@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
@@ -21,7 +22,12 @@ public class ItemStorage
     /**
      * Set this to ignore the damage value in comparisons.
      */
-    private final boolean ignoreDamageValue;
+    private final boolean shouldIgnoreDamageValue;
+
+    /**
+     * Set this to ignore the damage value in comparisons.
+     */
+    private final boolean shouldIgnoreNBTValue;
 
     /**
      * Amount of the storage.
@@ -38,7 +44,23 @@ public class ItemStorage
     public ItemStorage(@NotNull final ItemStack stack, final int amount, final boolean ignoreDamageValue)
     {
         this.stack = stack;
-        this.ignoreDamageValue = ignoreDamageValue;
+        this.shouldIgnoreDamageValue = ignoreDamageValue;
+        this.shouldIgnoreNBTValue = ignoreDamageValue;
+        this.amount = amount;
+    }
+
+    /**
+     * Creates an instance of the storage.
+     *
+     * @param stack                the stack.
+     * @param ignoreDamageValue    should the damage value be ignored?
+     * @param shouldIgnoreNBTValue should the nbt value be ignored?
+     */
+    public ItemStorage(@NotNull final ItemStack stack, final boolean ignoreDamageValue, final boolean shouldIgnoreNBTValue)
+    {
+        this.stack = stack;
+        this.shouldIgnoreDamageValue = ignoreDamageValue;
+        this.shouldIgnoreNBTValue = shouldIgnoreNBTValue;
         this.amount = amount;
     }
 
@@ -51,7 +73,8 @@ public class ItemStorage
     public ItemStorage(@NotNull final ItemStack stack, final boolean ignoreDamageValue)
     {
         this.stack = stack;
-        this.ignoreDamageValue = ignoreDamageValue;
+        this.shouldIgnoreDamageValue = ignoreDamageValue;
+        this.shouldIgnoreNBTValue = ignoreDamageValue;
         this.amount = ItemStackUtils.getSize(stack);
     }
 
@@ -63,7 +86,8 @@ public class ItemStorage
     public ItemStorage(@NotNull final ItemStack stack)
     {
         this.stack = stack;
-        this.ignoreDamageValue = false;
+        this.shouldIgnoreDamageValue = false;
+        this.shouldIgnoreNBTValue = false;
         this.amount = ItemStackUtils.getSize(stack);
     }
 
@@ -123,13 +147,15 @@ public class ItemStorage
      */
     public boolean ignoreDamageValue()
     {
-        return ignoreDamageValue;
+        return shouldIgnoreDamageValue;
     }
 
     @Override
     public int hashCode()
     {
-        return 31 * getItem().hashCode() + getDamageValue();
+        return Objects.hash(stack.getItem())
+                + (this.shouldIgnoreDamageValue ? 0 : (this.stack.getItemDamage() * 31))
+                + (this.shouldIgnoreNBTValue ? 0 : ((this.stack.getTagCompound() == null) ? 0 : this.stack.getTagCompound().hashCode()));
     }
 
     @Override
@@ -147,7 +173,9 @@ public class ItemStorage
         final ItemStorage that = (ItemStorage) o;
 
 
-        return getItem().equals(that.getItem()) && (this.ignoreDamageValue || that.getDamageValue() == this.getDamageValue());
+        return stack.isItemEqual(that.getItemStack())
+                && (this.shouldIgnoreDamageValue || that.getDamageValue() == this.getDamageValue())
+                && (this.shouldIgnoreNBTValue || that.getItemStack().getTagCompound() == this.getItemStack().getTagCompound());
     }
 
     /**

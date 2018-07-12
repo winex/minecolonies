@@ -1,14 +1,9 @@
 package com.minecolonies.coremod.colony.managers;
 
-import com.minecolonies.coremod.colony.Colony;
 import net.minecraft.entity.player.EntityPlayerMP;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
-
-import static com.minecolonies.api.util.constant.ColonyConstants.MAX_SQ_DIST_OLD_SUBSCRIBER_UPDATE;
-import static com.minecolonies.api.util.constant.ColonyConstants.MAX_SQ_DIST_SUBSCRIBER_UPDATE;
-import static com.minecolonies.api.util.constant.Constants.TICKS_HOUR;
 
 /**
  * Colony package manager, responsible to update views etc.
@@ -74,4 +69,16 @@ public interface IColonyPackageManager
      * Mark the package manager dirty.
      */
     void setDirty();
+
+    /**
+     * Add a new subsriber to the colony.
+     * @param subscriber the subscriber to add.
+     */
+    void addSubscribers(@NotNull final EntityPlayerMP subscriber);
+
+    /**
+     * Remove an old subsriber from the colony.
+     * @param player the subscriber to remove.
+     */
+    void removeSubscriber(@NotNull final EntityPlayerMP player);
 }

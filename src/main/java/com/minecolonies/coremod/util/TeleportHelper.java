@@ -33,8 +33,12 @@ public final class TeleportHelper
             return false;
         }
 
-        citizen.dismountRidingEntity();
+        if(citizen.getCitizenSleepHandler().isAsleep())
+        {
+            citizen.getCitizenSleepHandler().onWakeUp();
+        }
 
+        citizen.dismountRidingEntity();
         citizen.setLocationAndAngles(
           spawnPoint.getX() + MIDDLE_BLOCK_OFFSET,
           spawnPoint.getY(),
@@ -46,6 +50,10 @@ public final class TeleportHelper
             citizen.getProxy().reset();
         }
         citizen.getNavigator().clearPath();
+        if(citizen.getProxy() != null)
+        {
+            citizen.getProxy().reset();
+        }
 
         return true;
     }

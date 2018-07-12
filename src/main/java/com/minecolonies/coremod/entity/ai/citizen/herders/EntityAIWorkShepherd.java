@@ -2,6 +2,7 @@ package com.minecolonies.coremod.entity.ai.citizen.herders;
 
 import com.minecolonies.api.util.constant.ToolType;
 import com.minecolonies.api.util.constant.TranslationConstants;
+import com.minecolonies.coremod.colony.buildings.workerbuildings.BuildingShepherd;
 import com.minecolonies.coremod.colony.jobs.JobShepherd;
 import com.minecolonies.coremod.entity.ai.util.AIState;
 import com.minecolonies.coremod.entity.ai.util.AITarget;
@@ -48,10 +49,17 @@ public class EntityAIWorkShepherd extends AbstractEntityAIHerder<JobShepherd, En
     public EntityAIWorkShepherd(@NotNull final JobShepherd job)
     {
         super(job);
+        worker.getCitizenExperienceHandler().setSkillModifier(2 * worker.getCitizenData().getDexterity() + worker.getCitizenData().getStrength());
         toolsNeeded.add(ToolType.SHEARS);
         super.registerTargets(
           new AITarget(SHEPHERD_SHEAR, this::shearSheep)
         );
+    }
+
+    @Override
+    public Class getExpectedBuildingClass()
+    {
+        return BuildingShepherd.class;
     }
 
     @Override
@@ -96,16 +104,16 @@ public class EntityAIWorkShepherd extends AbstractEntityAIHerder<JobShepherd, En
      */
     private AIState shearSheep()
     {
-        worker.setLatestStatus(new TextComponentTranslation(TranslationConstants.COM_MINECOLONIES_COREMOD_STATUS_SHEPHERD_SHEARING));
+        worker.getCitizenStatusHandler().setLatestStatus(new TextComponentTranslation(TranslationConstants.COM_MINECOLONIES_COREMOD_STATUS_SHEPHERD_SHEARING));
 
         final List<EntitySheep> sheeps = searchForAnimals();
 
         if (sheeps.isEmpty())
         {
-            return HERDER_DECIDE;
+            return DECIDE;
         }
 
-        if (!equipTool(ToolType.SHEARS))
+        if (!equipTool(EnumHand.MAIN_HAND, ToolType.SHEARS))
         {
             return PREPARING;
         }
@@ -128,17 +136,17 @@ public class EntityAIWorkShepherd extends AbstractEntityAIHerder<JobShepherd, En
 
             worker.getHeldItemMainhand().damageItem(1, worker);
 
-            worker.addExperience(EXP_PER_SHEEP);
+            worker.getCitizenExperienceHandler().addExperience(EXP_PER_SHEEP);
 
             for (final ItemStack item : items)
             {
                 worker.getInventoryCitizen().addItemStackToInventory(item);
             }
         }
+        worker.getCitizenExperienceHandler().addExperience(1.0);
+        incrementActionsDoneAndDecSaturation();
 
-        incrementActionsDone();
-
-        return HERDER_DECIDE;
+        return DECIDE;
     }
 
     /**
@@ -148,9 +156,9 @@ public class EntityAIWorkShepherd extends AbstractEntityAIHerder<JobShepherd, En
      */
     private void dyeSheepChance(final EntitySheep sheep)
     {
-        if (worker.getWorkBuilding() != null)
+        if (worker.getCitizenColonyHandler().getWorkBuilding() != null)
         {
-            final int chanceToDye = worker.getWorkBuilding().getBuildingLevel();
+            final int chanceToDye = worker.getCitizenColonyHandler().getWorkBuilding().getBuildingLevel();
 
             final int rand = world.rand.nextInt(HUNDRED_PERCENT_CHANCE);
 

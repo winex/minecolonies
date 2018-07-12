@@ -8,11 +8,16 @@ import com.minecolonies.api.util.NBTUtils;
 import com.minecolonies.coremod.MineColonies;
 import com.minecolonies.coremod.colony.CitizenData;
 import com.minecolonies.coremod.colony.Colony;
-import com.minecolonies.coremod.colony.buildings.*;
+import com.minecolonies.coremod.colony.HappinessData;
+import com.minecolonies.coremod.colony.buildings.AbstractBuilding;
+import com.minecolonies.coremod.colony.buildings.AbstractBuildingGuards;
+import com.minecolonies.coremod.colony.buildings.AbstractBuildingWorker;
+import com.minecolonies.coremod.colony.buildings.workerbuildings.BuildingBarracksTower;
+import com.minecolonies.coremod.colony.buildings.workerbuildings.BuildingHome;
 import com.minecolonies.coremod.entity.EntityCitizen;
 import com.minecolonies.coremod.network.messages.ColonyViewCitizenViewMessage;
 import com.minecolonies.coremod.network.messages.ColonyViewRemoveCitizenMessage;
-import com.minecolonies.coremod.util.ColonyUtils;
+import com.minecolonies.coremod.network.messages.HappinessDataMessage;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -29,7 +34,8 @@ import java.util.stream.Collectors;
 
 import static com.minecolonies.api.util.constant.ColonyConstants.*;
 import static com.minecolonies.api.util.constant.Constants.*;
-import static com.minecolonies.api.util.constant.NbtTagConstants.*;
+import static com.minecolonies.api.util.constant.NbtTagConstants.TAG_CITIZENS;
+import static com.minecolonies.api.util.constant.NbtTagConstants.TAG_MAX_CITIZENS;
 
 public class CitizenManager implements ICitizenManager
 {
@@ -42,7 +48,7 @@ public class CitizenManager implements ICitizenManager
     /**
      * Variables to determine if citizens have to be updated on the client side.
      */
-    private boolean isCitizensDirty  = false;
+    private boolean isCitizensDirty = false;
 
     /**
      * The highest citizen id.
@@ -60,7 +66,13 @@ public class CitizenManager implements ICitizenManager
     private final Colony colony;
 
     /**
+     * Datas about the happiness of a colony
+     */
+    private final HappinessData happinessData = new HappinessData();
+
+    /**
      * Creates the Citizenmanager for a colony.
+     *
      * @param colony the colony.
      */
     public CitizenManager(final Colony colony)
@@ -97,37 +109,54 @@ public class CitizenManager implements ICitizenManager
 
     @Override
     public void sendPackets(
-            @NotNull final Set<EntityPlayerMP> oldSubscribers,
-            final boolean hasNewSubscribers,
-            @NotNull final Set<EntityPlayerMP> subscribers)
+      @NotNull final Set<EntityPlayerMP> oldSubscribers,
+      final boolean hasNewSubscribers,
+      @NotNull final Set<EntityPlayerMP> subscribers)
     {
         if (isCitizensDirty || hasNewSubscribers)
         {
             for (@NotNull final CitizenData citizen : citizens.values())
             {
-                if (citizen.isDirty() || hasNewSubscribers)
+                if (citizen.getCitizenEntity().isPresent())
                 {
-                    subscribers.stream()
-                            .filter(player -> citizen.isDirty() || !oldSubscribers.contains(player))
-                            .forEach(player -> MineColonies.getNetwork().sendTo(new ColonyViewCitizenViewMessage(colony, citizen), player));
+                    final List<EntityCitizen> list = colony.getWorld()
+                            .getEntities(EntityCitizen.class,
+                                    entityCitizen -> entityCitizen.getCitizenColonyHandler().getColony().getID() == colony.getID() && entityCitizen.getCitizenData().getId() == citizen.getId());
+
+                    if (!list.isEmpty() && citizen.getCitizenEntity().get().getEntityId() != list.get(0).getEntityId())
+                    {
+                        citizen.setCitizenEntity(list.get(0));
+                    }
+
+                    for (int i = 1; i < list.size(); i++)
+                    {
+                        Log.getLogger().warn("Removing duplicate entity now!");
+                        colony.getWorld().removeEntity(list.get(i));
+                    }
+
+                    if (citizen.isDirty() || hasNewSubscribers)
+                    {
+                        subscribers.stream()
+                          .filter(player -> citizen.isDirty() || !oldSubscribers.contains(player))
+                          .forEach(player -> MineColonies.getNetwork().sendTo(new ColonyViewCitizenViewMessage(colony, citizen), player));
+                    }
                 }
             }
-        }
-    }
 
-    @Override
-    public void spawnCitizenIfNull(@Nullable final CitizenData data, @NotNull final World world)
-    {
-        if (data.getCitizenEntity() == null)
-        {
-            Log.getLogger().warn(String.format("Citizen #%d:%d has gone AWOL, respawning them!", colony.getID(), data.getId()));
-            spawnCitizen(data, world);
+            subscribers.stream()
+              .filter(player -> !oldSubscribers.contains(player))
+              .forEach(player -> MineColonies.getNetwork().sendTo(new HappinessDataMessage(colony, colony.getHappinessData()), player));
         }
     }
 
     @Override
     public void spawnCitizen(@Nullable final CitizenData data, @Nullable final World world)
     {
+        if (!colony.getBuildingManager().hasTownHall())
+        {
+            return;
+        }
+
         final BlockPos townHallLocation = colony.getBuildingManager().getTownHall().getLocation();
         if (!world.isBlockLoaded(townHallLocation))
         {
@@ -163,19 +192,23 @@ public class CitizenManager implements ICitizenManager
                 if (getMaxCitizens() == getCitizens().size())
                 {
                     LanguageHandler.sendPlayersMessage(
-                            colony.getMessageEntityPlayers(),
-                            "tile.blockHutTownHall.messageMaxSize",
-                            colony.getName());
+                      colony.getMessageEntityPlayers(),
+                      "tile.blockHutTownHall.messageMaxSize",
+                      colony.getName());
                 }
             }
-            entity.setColony(colony, citizenData);
+            else
+            {
+                citizenData.setCitizenEntity(entity);
+            }
+
+            entity.getCitizenColonyHandler().setColony(colony, citizenData);
 
             entity.setPosition(spawnPoint.getX() + HALF_BLOCK, spawnPoint.getY() + SLIGHTLY_UP, spawnPoint.getZ() + HALF_BLOCK);
             world.spawnEntity(entity);
 
             colony.getStatsManager().checkAchievements();
             markCitizensDirty();
-            colony.markDirty();
         }
     }
 
@@ -248,7 +281,7 @@ public class CitizenManager implements ICitizenManager
         newMaxCitizens = Math.max(Configurations.gameplay.maxCitizens, newMaxCitizens);
         if (getMaxCitizens() != newMaxCitizens)
         {
-            setMaxCitizens(newMaxCitizens);
+            setMaxCitizens(Math.min(newMaxCitizens,Configurations.gameplay.maxCitizenPerColony));
         }
         colony.markDirty();
     }
@@ -271,6 +304,7 @@ public class CitizenManager implements ICitizenManager
     @Override
     public void markCitizensDirty()
     {
+        colony.markDirty();
         isCitizensDirty = true;
     }
 
@@ -341,16 +375,31 @@ public class CitizenManager implements ICitizenManager
         if (averageHousing > 1)
         {
             colony.increaseOverallHappiness(averageHousing * HAPPINESS_FACTOR);
+            colony.getHappinessData().setHousing(HappinessData.INCREASE);
+        }
+        else if (averageHousing < 1)
+        {
+            colony.getHappinessData().setHousing(HappinessData.DECREASE);
+        }
+        else
+        {
+            colony.getHappinessData().setHousing(HappinessData.STABLE);
         }
 
         final int averageSaturation = (int) (saturation / getCitizens().size());
         if (averageSaturation < WELL_SATURATED_LIMIT)
         {
             colony.decreaseOverallHappiness((averageSaturation - WELL_SATURATED_LIMIT) * -HAPPINESS_FACTOR);
+            colony.getHappinessData().setSaturation(HappinessData.DECREASE);
         }
         else if (averageSaturation > WELL_SATURATED_LIMIT)
         {
             colony.increaseOverallHappiness((averageSaturation - WELL_SATURATED_LIMIT) * HAPPINESS_FACTOR);
+            colony.getHappinessData().setSaturation(HappinessData.INCREASE);
+        }
+        else
+        {
+            colony.getHappinessData().setSaturation(HappinessData.STABLE);
         }
 
         final int relation = workers / guards;
@@ -358,19 +407,21 @@ public class CitizenManager implements ICitizenManager
         if (relation > 1)
         {
             colony.decreaseOverallHappiness(relation * HAPPINESS_FACTOR);
+            colony.getHappinessData().setGuards(HappinessData.DECREASE);
+        }
+        else if (relation < 1)
+        {
+            colony.getHappinessData().setGuards(HappinessData.INCREASE);
+        }
+        else
+        {
+            colony.getHappinessData().setGuards(HappinessData.STABLE);
         }
     }
 
     @Override
     public void onWorldTick(final TickEvent.WorldTickEvent event)
     {
-        //  Detect CitizenData whose EntityCitizen no longer exist in world, and clear the mapping
-        //  Consider handing this in an ChunkUnload Event instead?
-        getCitizens()
-                .stream()
-                .filter(ColonyUtils::isCitizenMissingFromWorld)
-                .forEach(CitizenData::updateCitizenEntityIfNeccessary);
-
         //  Cleanup disappeared citizens
         //  It would be really nice if we didn't have to do this... but Citizens can disappear without dying!
         //  Every CLEANUP_TICK_INCREMENT, cleanup any 'lost' citizens
@@ -378,7 +429,7 @@ public class CitizenManager implements ICitizenManager
         {
             //  All chunks within a good range of the colony should be loaded, so all citizens should be loaded
             //  If we don't have any references to them, destroy the citizen
-            getCitizens().forEach(citizenData -> spawnCitizenIfNull(citizenData, colony.getWorld()));
+            getCitizens().stream().filter(Objects::nonNull).forEach(CitizenData::updateCitizenEntityIfNecessary);
         }
 
         //  Spawn Citizens

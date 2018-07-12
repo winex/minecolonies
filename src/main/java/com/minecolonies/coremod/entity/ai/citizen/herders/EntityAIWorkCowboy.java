@@ -2,12 +2,14 @@ package com.minecolonies.coremod.entity.ai.citizen.herders;
 
 import com.minecolonies.api.util.InventoryUtils;
 import com.minecolonies.api.util.constant.TranslationConstants;
+import com.minecolonies.coremod.colony.buildings.workerbuildings.BuildingCowboy;
 import com.minecolonies.coremod.colony.jobs.JobCowboy;
 import com.minecolonies.coremod.entity.ai.util.AIState;
 import com.minecolonies.coremod.entity.ai.util.AITarget;
 import net.minecraft.entity.passive.EntityCow;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.NotNull;
@@ -35,10 +37,17 @@ public class EntityAIWorkCowboy extends AbstractEntityAIHerder<JobCowboy, Entity
     public EntityAIWorkCowboy(@NotNull final JobCowboy job)
     {
         super(job);
+        worker.getCitizenExperienceHandler().setSkillModifier(2 * worker.getCitizenData().getDexterity() + worker.getCitizenData().getStrength());
         itemsNeeded.add(new ItemStack(Items.BUCKET));
         super.registerTargets(
           new AITarget(COWBOY_MILK, this::milkCows)
         );
+    }
+
+    @Override
+    public Class getExpectedBuildingClass()
+    {
+        return BuildingCowboy.class;
     }
 
     @Override
@@ -66,7 +75,9 @@ public class EntityAIWorkCowboy extends AbstractEntityAIHerder<JobCowboy, Entity
 
         final boolean hasBucket = InventoryUtils.hasItemInItemHandler(new InvWrapper(worker.getInventoryCitizen()), Items.BUCKET, 0);
 
-        if (result.equals(START_WORKING) && hasBucket)
+        final BuildingCowboy building = (BuildingCowboy) worker.getCitizenColonyHandler().getWorkBuilding();
+
+        if (building != null && building.isMilkCows() && result.equals(START_WORKING) && hasBucket)
         {
             return COWBOY_MILK;
         }
@@ -90,9 +101,9 @@ public class EntityAIWorkCowboy extends AbstractEntityAIHerder<JobCowboy, Entity
      */
     private AIState milkCows()
     {
-        worker.setLatestStatus(new TextComponentTranslation(TranslationConstants.COM_MINECOLONIES_COREMOD_STATUS_COWBOY_MILKING));
+        worker.getCitizenStatusHandler().setLatestStatus(new TextComponentTranslation(TranslationConstants.COM_MINECOLONIES_COREMOD_STATUS_COWBOY_MILKING));
 
-        if (!worker.hasItemInInventory(getBreedingItem().getItem(), 0) && isInHut(new ItemStack(Items.BUCKET, 1)))
+        if (!worker.getCitizenInventoryHandler().hasItemInInventory(getBreedingItem().getItem(), 0) && isInHut(new ItemStack(Items.BUCKET, 1)))
         {
             if (!walkToBuilding() && getOwnBuilding() != null)
             {
@@ -100,7 +111,7 @@ public class EntityAIWorkCowboy extends AbstractEntityAIHerder<JobCowboy, Entity
             }
             else
             {
-                return HERDER_DECIDE;
+                return DECIDE;
             }
         }
 
@@ -108,22 +119,23 @@ public class EntityAIWorkCowboy extends AbstractEntityAIHerder<JobCowboy, Entity
 
         if (cow == null)
         {
-            return HERDER_DECIDE;
+            return DECIDE;
         }
 
-        if (!walkingToAnimal(cow) && equipItem(new ItemStack(Items.BUCKET, 1)))
+        if (!walkingToAnimal(cow) && equipItem(EnumHand.MAIN_HAND, new ItemStack(Items.BUCKET, 1)))
         {
 
             if (!worker.getInventoryCitizen().addItemStackToInventory(new ItemStack(Items.MILK_BUCKET)))
             {
-                worker.removeHeldItem();
-                equipItem(new ItemStack(Items.MILK_BUCKET));
+                worker.getCitizenItemHandler().removeHeldItem();
+                equipItem(EnumHand.MAIN_HAND, new ItemStack(Items.MILK_BUCKET));
                 InventoryUtils.removeStackFromItemHandler(new InvWrapper(worker.getInventoryCitizen()), new ItemStack(Items.BUCKET, 1));
             }
 
-            incrementActionsDone();
+            incrementActionsDoneAndDecSaturation();
+            worker.getCitizenExperienceHandler().addExperience(1.0);
         }
 
-        return HERDER_DECIDE;
+        return DECIDE;
     }
 }
