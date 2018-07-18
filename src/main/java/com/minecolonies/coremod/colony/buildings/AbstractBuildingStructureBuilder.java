@@ -166,7 +166,7 @@ public abstract class AbstractBuildingStructureBuilder extends AbstractBuildingW
                 }
                 else
                 {
-                    final BlockPos relativePos = getLocation().subtract(pos);
+                    final BlockPos relativePos = pos.subtract(getLocation());
                     final EnumFacing facingX = EnumFacing.getFacingFromVector(relativePos.getX(), 0, 0);
                     final EnumFacing facingZ = EnumFacing.getFacingFromVector(0, 0, relativePos.getZ());
                     desc = relativePos.getX() + " " + facingX + " " + relativePos.getZ() + " " + facingZ;
